@@ -1,0 +1,327 @@
+<<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trung tâm quản trị · Góc nhỏ tâm sự</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#0b0f19; --surface:#111827; --ink:#f3f4f6; --ink-2:#9ca3af; --ink-3:#6b7280;
+  --line:#1f2937; --line-2:#1a2230;
+  --care:#00ff66; --care-bg:rgba(0,255,102,0.1);
+  --warn:#f59e0b; --warn-bg:rgba(245,158,11,0.1);
+  --risk:#ef4444; --risk-bg:rgba(239,68,68,0.1);
+  --radius:10px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{font-family:'Be Vietnam Pro',system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;background:var(--paper);color:var(--ink);font-size:14px;line-height:1.55;font-variant-numeric:tabular-nums;min-height:100vh}
+button,input{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--care);outline-offset:2px}
+[hidden]{display:none!important}
+
+/* Đăng nhập */
+.gate{min-height:100vh;display:grid;place-items:center;padding:24px}
+.gate-card{width:min(400px,100%);background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:36px 32px;box-shadow:0 10px 30px rgba(0,0,0,0.5)}
+.mark{width:40px;height:40px;border-radius:10px;background:#00ff66;color:#0b0f19;display:grid;place-items:center;margin-bottom:20px;font-weight:bold}
+.gate h1{font-size:20px;font-weight:600;letter-spacing:-.01em;color:#fff}
+.gate p{color:var(--ink-2);margin:6px 0 22px}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-size:13px;font-weight:500;color:var(--ink-2)}
+.input{width:100%;padding:11px 13px;border:1px solid var(--line);border-radius:8px;background:#0f172a;color:#fff;transition:border-color .15s,box-shadow .15s}
+.input:focus{outline:none;border-color:var(--care);box-shadow:0 0 0 3px rgba(0,255,102,0.15)}
+.err{color:var(--risk);font-size:13px;min-height:20px;margin-top:8px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 16px;border-radius:8px;border:1px solid var(--line);background:#1f2937;color:#fff;font-weight:500;cursor:pointer;transition:background .15s,border-color .15s}
+.btn:hover{background:#374151;border-color:#4b5563}
+.btn-primary{background:#00ff66;border-color:#00ff66;color:#0b0f19;width:100%;margin-top:14px;font-weight:600}
+.btn-primary:hover{background:#00cc52;border-color:#00cc52}
+.btn-danger{color:var(--risk);border-color:rgba(239,68,68,0.3);padding:6px 12px;font-size:13px;background:transparent}
+.btn-danger:hover{background:var(--risk-bg);border-color:var(--risk)}
+.btn:disabled{opacity:.55;cursor:default}
+
+/* Khung chính */
+.top{position:sticky;top:0;z-index:5;background:rgba(17,24,39,.9);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.top-in{max-width:1080px;margin:0 auto;padding:12px 24px;display:flex;align-items:center;gap:16px}
+.brand{display:flex;align-items:center;gap:12px;margin-right:auto;min-width:0}
+.brand .mark{margin:0;width:34px;height:34px;flex:none}
+.brand b{display:block;font-size:14px;font-weight:600;line-height:1.2;color:#fff}
+.brand span{display:block;font-size:12px;color:var(--care)}
+.auto{display:flex;align-items:center;gap:8px;color:var(--ink-2);font-size:13px;cursor:pointer;user-select:none}
+.auto input{accent-color:var(--care);width:15px;height:15px}
+main{max-width:1080px;margin:0 auto;padding:32px 24px 56px}
+
+/* Tình trạng hệ thống */
+.status{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:28px}
+.status h2{font-size:26px;font-weight:600;letter-spacing:-.02em;line-height:1.25;max-width:640px;color:#fff}
+.status h2 small{display:block;margin-top:6px;font-size:14px;font-weight:400;letter-spacing:0;color:var(--ink-2)}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--care);margin-right:10px;vertical-align:middle;box-shadow:0 0 0 4px var(--care-bg)}
+.dot.warn{background:var(--warn);box-shadow:0 0 0 4px var(--warn-bg)}
+.dot.risk{background:var(--risk);box-shadow:0 0 0 4px var(--risk-bg)}
+.stamp{color:var(--ink-3);font-size:13px}
+
+/* Chỉ số */
+.facts{display:grid;grid-template-columns:repeat(4,1fr);background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);margin-bottom:24px}
+.fact{padding:18px 20px;border-right:1px solid var(--line)}
+.fact:last-child{border-right:0}
+.fact dt{color:var(--ink-2);font-size:13px}
+.fact dd{font-size:26px;font-weight:600;letter-spacing:-.02em;margin-top:2px;color:#00ff66}
+.fact dd i{font-style:normal;font-size:14px;font-weight:400;color:var(--ink-3);margin-left:4px}
+.fact.hot dd{color:var(--risk)}
+.fact.mid dd{color:var(--warn)}
+
+/* Bảng */
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);margin-bottom:24px;overflow:hidden}
+.panel-h{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:16px 20px;border-bottom:1px solid var(--line)}
+.panel-h h3{font-size:15px;font-weight:600;color:#fff}
+.panel-h p{color:var(--ink-3);font-size:13px}
+.scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:560px}
+th,td{text-align:left;padding:12px 20px;border-bottom:1px solid var(--line);white-space:nowrap}
+th{font-size:13px;font-weight:500;color:var(--ink-2);background:#0f172a}
+tbody tr:last-child td{border-bottom:0}
+tbody tr:hover{background:rgba(255,255,255,0.02)}
+td.r,th.r{text-align:right}
+.ip{font-weight:500;color:#38bdf8}
+.sub{display:block;font-size:12px;color:var(--ink-3)}
+.muted{color:var(--ink-3)}
+.clip{max-width:260px;overflow:hidden;text-overflow:ellipsis}
+.tag{display:inline-flex;align-items:center;gap:6px;padding:2px 10px;border-radius:999px;font-size:12px;font-weight:500}
+.tag::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.tag.ok{background:var(--care-bg);color:var(--care)}
+.tag.wait{background:var(--warn-bg);color:var(--warn)}
+.tag.ban{background:var(--risk-bg);color:var(--risk)}
+.meter{display:flex;align-items:center;gap:10px}
+.meter-bar{width:96px;height:6px;border-radius:99px;background:var(--line);overflow:hidden}
+.meter-bar i{display:block;height:100%;background:var(--warn);border-radius:99px}
+.meter-bar i.full{background:var(--risk)}
+.empty{text-align:center;color:var(--ink-3);padding:34px 20px!important}
+
+.config{display:flex;flex-wrap:wrap;gap:8px 24px;color:var(--ink-2);font-size:13px;padding:0 2px}
+.config b{font-weight:500;color:#fff}
+
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);background:#1f2937;color:#fff;border:1px solid var(--line);padding:11px 18px;border-radius:8px;font-size:13px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:20}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+@media(max-width:820px){
+  .facts{grid-template-columns:1fr 1fr}
+  .fact:nth-child(2){border-right:0}
+  .fact:nth-child(-n+2){border-bottom:1px solid var(--line)}
+  .top-in,main{padding-left:16px;padding-right:16px}
+  .status h2{font-size:22px}
+  .auto span{display:none}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<section class="gate" id="gate">
+  <form class="gate-card" id="loginForm" autocomplete="off">
+    <div class="mark" aria-hidden="true">&gt;_</div>
+    <h1>Đăng nhập quản trị</h1>
+    <p>Chỉ dành cho người phụ trách Góc nhỏ tâm sự.</p>
+    <div class="field">
+      <label for="keyInput">Khóa quản trị</label>
+      <input class="input" id="keyInput" type="password" required autofocus>
+    </div>
+    <div class="err" id="loginErr" role="alert"></div>
+    <button class="btn btn-primary" id="loginBtn" type="submit">Đăng nhập</button>
+  </form>
+</section>
+
+<div id="app" hidden>
+  <header class="top">
+    <div class="top-in">
+      <div class="brand">
+        <div class="mark" aria-hidden="true">&gt;_</div>
+        <div><b>Góc nhỏ tâm sự</b><span>Trung tâm quản trị</span></div>
+      </div>
+      <label class="auto"><input type="checkbox" id="autoToggle" checked><span>Tự động cập nhật</span></label>
+      <button class="btn" id="refreshBtn" type="button">Cập nhật</button>
+      <button class="btn" id="logoutBtn" type="button">Đăng xuất</button>
+    </div>
+  </header>
+
+  <main>
+    <div class="status">
+      <h2 id="statusTitle"><span class="dot" id="statusDot"></span><span id="statusText">Đang tải…</span><small id="statusSub"></small></h2>
+      <div class="stamp" id="stamp"></div>
+    </div>
+
+    <dl class="facts">
+      <div class="fact"><dt>Khóa API sẵn sàng</dt><dd id="fKeys">–</dd></div>
+      <div class="fact"><dt>Phiên đang mở</dt><dd id="fSessions">–</dd></div>
+      <div class="fact" id="fWarnBox"><dt>Thiết bị bị nhắc nhở</dt><dd id="fWarn">–</dd></div>
+      <div class="fact" id="fBanBox"><dt>Thiết bị đang bị khóa</dt><dd id="fBan">–</dd></div>
+    </dl>
+
+    <section class="panel">
+      <div class="panel-h"><h3>Thiết bị đang bị khóa</h3><p>Mở khóa sớm nếu học sinh bị chặn nhầm.</p></div>
+      <div class="scroll"><table>
+        <thead><tr><th>Thiết bị</th><th>Lý do</th><th>Hết hạn lúc</th><th>Còn lại</th><th class="r"><span class="sr" style="position:absolute;left:-9999px">Thao tác</span></th></tr></thead>
+        <tbody id="banBody"></tbody>
+      </table></div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-h"><h3>Thiết bị bị nhắc nhở</h3><p id="warnHint">Đạt giới hạn nhắc nhở sẽ bị khóa tự động.</p></div>
+      <div class="scroll"><table>
+        <thead><tr><th>Thiết bị</th><th>Mức nhắc nhở</th><th>Lần gần nhất</th></tr></thead>
+        <tbody id="warnBody"></tbody>
+      </table></div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-h"><h3>Khóa API Gemini</h3><p>Hệ thống tự chuyển khóa khi một khóa hết lượt hoặc lỗi.</p></div>
+      <div class="scroll"><table>
+        <thead><tr><th>Khóa</th><th>Trạng thái</th><th class="r">Lượt dùng</th><th class="r">Lỗi</th><th>Lỗi gần nhất</th></tr></thead>
+        <tbody id="keyBody"></tbody>
+      </table></div>
+    </section>
+
+    <div class="config" id="config"></div>
+  </main>
+</div>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let KEY = '', timer = null;
+try { KEY = sessionStorage.getItem('adminKey') || ''; } catch (e) {}
+
+async function api(path, opts = {}) {
+  const res = await fetch(path, { ...opts, headers: { 'Content-Type': 'application/json', 'x-admin-key': KEY, ...(opts.headers || {}) } });
+  if (res.status === 401) throw Object.assign(new Error('auth'), { auth: true });
+  if (res.status === 404) throw Object.assign(new Error('off'), { off: true });
+  if (!res.ok) throw new Error('http ' + res.status);
+  return res.json();
+}
+
+function toast(msg) {
+  const t = $('toast'); t.textContent = msg; t.classList.add('show');
+  clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove('show'), 2600);
+}
+
+function showApp(on) { $('gate').hidden = on; $('app').hidden = !on; }
+
+function fmtWait(sec) {
+  if (sec < 60) return sec + ' giây';
+  return Math.ceil(sec / 60) + ' phút';
+}
+
+const who = (ip, client) => `<span class="ip">${esc(ip)}</span>` + (client && client !== ip ? `<span class="sub">${esc(String(client).split('|')[1] || '')}</span>` : '');
+
+function render(d) {
+  const keys = d.keys || [], warns = d.warnings || [], bans = d.banned || [];
+  const ready = keys.filter(k => k.available).length;
+
+  const dot = $('statusDot');
+  dot.className = 'dot';
+  let title, sub;
+  if (!keys.length || ready === 0) {
+    dot.classList.add('risk'); title = 'Trợ lý AI đang tạm ngừng';
+    sub = keys.length ? 'Tất cả khóa API đang nghỉ. Học sinh vẫn nhận được câu trả lời dự phòng và đường dây hỗ trợ.' : 'Chưa cấu hình khóa API nào trong tệp .env.';
+  } else if (bans.length || ready < keys.length) {
+    dot.classList.add('warn'); title = 'Hệ thống hoạt động, cần lưu ý';
+    sub = [bans.length ? `${bans.length} thiết bị đang bị khóa` : '', ready < keys.length ? `${keys.length - ready} khóa API đang nghỉ` : ''].filter(Boolean).join(' · ');
+  } else {
+    title = 'Mọi thứ đang hoạt động bình thường';
+    sub = `${ready} khóa API sẵn sàng, không có thiết bị nào bị khóa.`;
+  }
+  $('statusText').textContent = title;
+  $('statusSub').textContent = sub;
+  $('stamp').textContent = 'Cập nhật lúc ' + new Date().toLocaleTimeString('vi-VN');
+
+  $('fKeys').innerHTML = `${ready}<i>/ ${keys.length}</i>`;
+  $('fSessions').textContent = d.activeSessions ?? 0;
+  $('fWarn').textContent = warns.length; $('fBan').textContent = bans.length;
+  $('fWarnBox').className = 'fact' + (warns.length ? ' mid' : '');
+  $('fBanBox').className = 'fact' + (bans.length ? ' hot' : '');
+
+  $('banBody').innerHTML = bans.length ? bans.map(b => `
+    <tr>
+      <td>${who(b.ip, b.client)}</td>
+      <td>${esc(b.reason)}</td>
+      <td class="muted">${esc(b.until)}</td>
+      <td><span class="tag ban">${esc(b.remainingMin)} phút</span></td>
+      <td class="r"><button class="btn btn-danger" data-unban="${esc(b.client)}" data-ip="${esc(b.ip)}">Mở khóa</button></td>
+    </tr>`).join('') : `<tr><td colspan="5" class="empty">Hiện không có thiết bị nào bị khóa.</td></tr>`;
+
+  const limit = d.warningLimit || 3;
+  $('warnHint').textContent = `Đạt ${limit} lần nhắc nhở sẽ bị khóa ${d.banMinutes || 60} phút.`;
+  $('warnBody').innerHTML = warns.length ? warns.map(w => `
+    <tr>
+      <td>${who(w.ip, w.client)}</td>
+      <td><div class="meter"><div class="meter-bar"><i class="${w.count >= limit ? 'full' : ''}" style="width:${Math.min(100, w.count / limit * 100)}%"></i></div>${esc(w.count)} / ${esc(limit)}</div></td>
+      <td class="muted">${esc(w.lastAt)}</td>
+    </tr>`).join('') : `<tr><td colspan="3" class="empty">Chưa ghi nhận lời lẽ không phù hợp nào.</td></tr>`;
+
+  $('keyBody').innerHTML = keys.length ? keys.map(k => `
+    <tr>
+      <td><span class="ip">${esc(k.key)}</span><span class="sub">Khóa số ${esc(k.id)}</span></td>
+      <td>${k.available ? '<span class="tag ok">Sẵn sàng</span>' : `<span class="tag wait">Nghỉ ${esc(fmtWait(k.cooldownLeftSec))}</span>`}</td>
+      <td class="r">${esc(k.uses)}</td>
+      <td class="r">${esc(k.fails)}</td>
+      <td class="muted clip" title="${esc(k.lastError)}">${k.lastError ? esc(k.lastError) : '–'}</td>
+    </tr>`).join('') : `<tr><td colspan="5" class="empty">Chưa có khóa API. Thêm GEMINI_API_KEYS vào tệp .env rồi chạy lại máy chủ.</td></tr>`;
+
+  const scope = d.banScope === 'ip' ? 'Theo địa chỉ IP' : 'Theo IP và phiên';
+  $('config').innerHTML = `<span>Mô hình <b>${esc(d.model)}</b></span><span>Dự phòng <b>${esc(d.fallbackModel)}</b></span><span>Cách khóa <b>${scope}</b></span>`;
+}
+
+async function load(silent) {
+  try {
+    render(await api('/api/admin-dashboard'));
+    showApp(true);
+    return true;
+  } catch (e) {
+    if (e.auth || e.off) {
+      KEY = ''; try { sessionStorage.removeItem('adminKey'); } catch (x) {}
+      stop(); showApp(false);
+      $('loginErr').textContent = e.off ? 'Máy chủ chưa bật trang quản trị. Hãy đặt ADMIN_KEY trong tệp .env.' : 'Khóa không đúng. Kiểm tra lại và thử lần nữa.';
+    } else if (!silent) {
+      toast('Không kết nối được máy chủ. Kiểm tra máy chủ đã chạy chưa.');
+    }
+    return false;
+  }
+}
+
+function start() { stop(); if ($('autoToggle').checked) timer = setInterval(() => load(true), 15000); }
+function stop() { clearInterval(timer); timer = null; }
+
+$('loginForm').addEventListener('submit', async ev => {
+  ev.preventDefault();
+  KEY = $('keyInput').value.trim(); if (!KEY) return;
+  $('loginErr').textContent = ''; $('loginBtn').disabled = true; $('loginBtn').textContent = 'Đang kiểm tra…';
+  const ok = await load(false);
+  $('loginBtn').disabled = false; $('loginBtn').textContent = 'Đăng nhập';
+  if (ok) { try { sessionStorage.setItem('adminKey', KEY); } catch (x) {} $('keyInput').value = ''; start(); }
+});
+
+$('refreshBtn').addEventListener('click', async () => { if (await load(false)) toast('Đã cập nhật'); });
+$('autoToggle').addEventListener('change', start);$('logoutBtn').addEventListener('click', () => {
+  KEY = ''; try { sessionStorage.removeItem('adminKey'); } catch (x) {}
+  stop(); showApp(false); $('loginErr').textContent = '';$('keyInput').focus();
+});
+
+$('banBody').addEventListener('click', async ev => {
+  const btn = ev.target.closest('[data-unban]'); if (!btn) return;
+  if (!confirm(`Mở khóa cho thiết bị ${btn.dataset.ip}?`)) return;
+  btn.disabled = true;
+  try {
+    await api('/api/admin-unban', { method: 'POST', body: JSON.stringify({ client: btn.dataset.unban }) });
+    toast('Đã mở khóa ' + btn.dataset.ip);
+    load(true);
+  } catch (e) { btn.disabled = false; toast('Mở khóa chưa được. Thử lại sau.'); }
+});
+
+if (KEY) load(true).then(ok => { if (ok) start(); });
+</script>
+</body>
+</html>
