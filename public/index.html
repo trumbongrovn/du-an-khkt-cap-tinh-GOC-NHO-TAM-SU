@@ -59,8 +59,8 @@
 }
 
 body.theme-branch-1 { --bg: #cfe2f3; --card: #e8f1f9; --text: #2c3e50; --muted: #597a96; --bg-grad: radial-gradient(circle at top right, #eef5fb, #bcdff9); --accent-glow: rgba(52, 152, 219, 0.4); }
-body.theme-branch-2 { --bg: #d9ead3; --card: #eaf4e8; --text: #274e13; --muted: #53823b; --bg-grad: radial-gradient(circle at top right, #f1f9f0, #b6d7a8); --accent-glow: rgba(46, 204, 113, 0.4); }
-body.theme-branch-3 { --bg: #d9d2e9; --card: #eae7f2; --text: #351c75; --muted: #674ea7; --bg-grad: radial-gradient(circle at top right, #f3f1f8, #b4a7d6); --accent-glow: rgba(155, 89, 182, 0.4); }
+body.theme-branch-2 { --bg: #ffe599; --card: #fff6d9; --text: #7f6000; --muted: #a98b1f; --bg-grad: radial-gradient(circle at top right, #fffaea, #ffd966); --accent-glow: rgba(241, 194, 50, 0.45); }
+body.theme-branch-3 { --bg: #d9ead3; --card: #eaf4e8; --text: #274e13; --muted: #53823b; --bg-grad: radial-gradient(circle at top right, #f1f9f0, #b6d7a8); --accent-glow: rgba(46, 204, 113, 0.4); }
 body.theme-branch-4 { --bg: #f4cccc; --card: #fae2e2; --text: #660000; --muted: #a64d79; --bg-grad: radial-gradient(circle at top right, #fce8e8, #ea9999); --accent-glow: rgba(231, 76, 60, 0.4); }
 
 body.dark-mode {
@@ -150,7 +150,9 @@ button, input { font: inherit; color: var(--text); }
 @keyframes bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1.0); opacity: 1; } }
 
 .options { display: flex; flex-direction: column; gap: 12px; margin: 10px 0 20px 76px; max-width: min(80%, 620px); animation: fadeIn 0.4s ease-in-out; }
-.opt { border: 1px solid var(--line); border-radius: 20px; padding: 14px 22px; text-align: left; cursor: pointer; transition: 0.25s; font-weight: 600; font-size: 15px; color: var(--text); box-shadow: 0 4px 12px rgba(160, 120, 100, 0.08); display: flex; align-items: center; justify-content: space-between; background: var(--element-bg); }
+.opt { border: 1px solid var(--line); border-radius: 14px; padding: 14px 22px; text-align: left; cursor: pointer; transition: 0.25s; font-weight: 600; font-size: 15px; color: var(--text); box-shadow: 0 4px 12px rgba(160, 120, 100, 0.08); display: flex; align-items: center; justify-content: space-between; background: var(--element-bg); }
+/* Các ô cảm xúc / nguyên nhân / bước tiếp theo nhuốm theo màu nhánh đang chọn, giống tông màu trong sơ đồ */
+.opt.normal-opt { background: var(--card); border: 1.5px solid var(--muted); box-shadow: 0 4px 14px var(--accent-glow, rgba(160,120,100,0.1)); }
 .opt:hover { transform: translateY(-3px); box-shadow: 0 6px 18px rgba(160, 120, 100, 0.15); }
 .opt div span { display: block; font-size: 13px; color: var(--muted); margin-top: 3px; font-weight: 400; }
 /* Ô đã chọn xong thì khóa lại để luồng không bị rối */
@@ -158,10 +160,41 @@ button, input { font: inherit; color: var(--text); }
 .opt:disabled:hover { transform: none; box-shadow: 0 4px 12px rgba(160, 120, 100, 0.08); }
 .opt.chosen { opacity: 1; outline: 2px solid var(--muted); }
 
-.options.default-opts .opt:nth-child(1) { background: #f4cccc; border-color: #ea9999; }
+.options.default-opts .opt:nth-child(1) { background: #cfe2f3; border-color: #9fc5e8; }
 .options.default-opts .opt:nth-child(2) { background: #ffe599; border-color: #ffd966; }
 .options.default-opts .opt:nth-child(3) { background: #d9ead3; border-color: #b6d7a8; }
-.options.default-opts .opt:nth-child(4) { background: #d9d2e9; border-color: #b4a7d6; }
+.options.default-opts .opt:nth-child(4) { background: #f4cccc; border-color: #ea9999; }
+
+/* ====== FLOWTREE VIP PRO MAX: hiệu ứng chọn lựa cao cấp ====== */
+.opt { position: relative; overflow: hidden; opacity: 0; animation: optIn 0.5s cubic-bezier(.34,1.56,.64,1) forwards; animation-delay: calc(var(--oi, 0) * 70ms); will-change: transform, opacity; }
+@keyframes optIn { from { opacity: 0; transform: translateY(16px) scale(0.93); } to { opacity: 1; transform: translateY(0) scale(1); } }
+.opt span[style] { display: inline-flex; transition: transform 0.3s cubic-bezier(.34,1.56,.64,1); }
+.opt:hover span[style] { transform: scale(1.18) rotate(-6deg); }
+.opt:active:not(:disabled) { transform: scale(0.96) translateY(-1px); transition-duration: 0.1s; }
+.opt-ripple { position: absolute; border-radius: 50%; background: rgba(255, 255, 255, 0.55); transform: scale(0); animation: optRipple 0.55s ease-out forwards; pointer-events: none; }
+@keyframes optRipple { to { transform: scale(3); opacity: 0; } }
+.opt.chosen { animation: optChosen 0.45s cubic-bezier(.34,1.56,.64,1); box-shadow: 0 0 0 4px var(--accent-glow, rgba(232,168,124,0.4)), 0 8px 20px rgba(160, 120, 100, 0.2); }
+@keyframes optChosen { 0% { transform: scale(1); } 45% { transform: scale(1.045); } 100% { transform: scale(1); } }
+.opt.chosen::before { content: "✓"; position: absolute; top: 8px; right: 10px; width: 20px; height: 20px; border-radius: 50%; background: #4caf7d; color: #fff; font-size: 11px; font-weight: 800; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(0,0,0,0.2); animation: optCheckIn 0.35s cubic-bezier(.34,1.56,.64,1) 0.08s backwards; }
+@keyframes optCheckIn { from { opacity: 0; transform: scale(0) rotate(-45deg); } to { opacity: 1; transform: scale(1) rotate(0); } }
+.opt:disabled:not(.chosen) { transition: opacity 0.35s ease, transform 0.35s ease, filter 0.35s ease; opacity: 0.4; transform: scale(0.98); filter: grayscale(0.25); }
+
+/* Thanh tiến trình hành trình cảm xúc (lấy cảm hứng từ sơ đồ 4 nhánh) */
+/* Kiểu "sơ đồ nhánh" - các ô vuông nối bằng mũi tên, giống sơ đồ Vấn đề → Cảm xúc → Nguyên nhân → Giải pháp */
+.flow-progress { display: none; align-items: center; gap: 5px; padding: 10px 14px 8px; background: var(--header-bg); transition: background 0.3s; overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none; }
+.flow-progress::-webkit-scrollbar { display: none; }
+.flow-progress.show { display: flex; animation: fadeIn 0.4s ease; }
+.fp-step { display: flex; align-items: center; gap: 6px; flex: 0 0 auto; padding: 7px 12px; border-radius: 12px; border: 2px solid var(--line); background: var(--element-bg); font-size: 11.5px; font-weight: 700; color: var(--muted); white-space: nowrap; transition: 0.35s cubic-bezier(.34,1.56,.64,1); }
+.fp-num { width: 18px; height: 18px; border-radius: 50%; background: var(--line); color: var(--card); font-size: 10px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: 0.35s cubic-bezier(.34,1.56,.64,1); }
+.fp-label { font-size: 11px; font-weight: 700; white-space: nowrap; transition: color 0.3s; }
+.fp-arrow { flex: 0 0 auto; font-size: 14px; font-weight: 800; color: var(--line); transition: color 0.4s ease, transform 0.4s ease; }
+.fp-step.done { background: #e5f6ec; border-color: #4caf7d; color: #2f8a5c; }
+.fp-step.done .fp-num { background: #4caf7d; color: #fff; }
+.fp-arrow.done { color: #4caf7d; transform: scale(1.15); }
+.fp-step.active { background: var(--btn-orange); border-color: #c47c48; color: var(--text); box-shadow: 0 0 0 4px var(--accent-glow, rgba(232,168,124,0.4)); animation: fpPulse 1.6s ease-in-out infinite; transform: scale(1.05); }
+.fp-step.active .fp-num { background: #c47c48; color: #fff; }
+@keyframes fpPulse { 0%, 100% { box-shadow: 0 0 0 3px var(--accent-glow, rgba(232,168,124,0.4)); } 50% { box-shadow: 0 0 0 7px var(--accent-glow, rgba(232,168,124,0.4)); } }
+@media (max-width: 640px) { .fp-label { display: none; } .fp-step { padding: 7px 9px; } .fp-arrow { font-size: 12px; } }
 
 /* THANH NHẬP LIỆU & NÚT GỬI */
 .composer { padding: 20px 30px; background: var(--header-bg); border-top: 1px solid var(--line); transition: 0.3s; position: relative; display: flex; align-items: center; gap: 12px; }
@@ -496,6 +529,17 @@ button:focus-visible, .opt:focus-visible, .floating-btn:focus-visible, .floating
       <button onclick="restartInteractive()" aria-label="Bắt đầu lại cuộc trò chuyện">↻ Làm mới</button>
     </div>
   </header>
+  <div class="flow-progress" id="flowProgress" aria-hidden="true">
+    <div class="fp-step" data-step="problem"><span class="fp-num">1</span><span class="fp-label">Vấn đề</span></div>
+    <div class="fp-arrow">→</div>
+    <div class="fp-step" data-step="emotion"><span class="fp-num">2</span><span class="fp-label">Cảm xúc</span></div>
+    <div class="fp-arrow">→</div>
+    <div class="fp-step" data-step="cause"><span class="fp-num">3</span><span class="fp-label">Nguyên nhân</span></div>
+    <div class="fp-arrow">→</div>
+    <div class="fp-step" data-step="solution"><span class="fp-num">4</span><span class="fp-label">Giải pháp</span></div>
+    <div class="fp-arrow">→</div>
+    <div class="fp-step" data-step="followup"><span class="fp-num">5</span><span class="fp-label">Chữa lành</span></div>
+  </div>
   <section id="chat" class="chat" aria-live="polite">
     <div class="welcome"><h2>Chào cậu 💖</h2><p>Cậu đang gặp khó khăn gì? Hãy chọn hoặc chia sẻ với mình nhé.</p><p class="privacy-note">🔒 Tin nhắn cậu gõ hoặc nói được gửi tới AI để trả lời và không bị lưu lại. Nhà trường chỉ nhận số đếm ẩn danh (chủ đề đã chọn, điểm tâm trạng), không có tên hay nội dung tin nhắn. Góc nhỏ tâm sự là người bạn lắng nghe, không thay thế thầy cô, bố mẹ hay chuyên gia tâm lý.</p></div>
   </section>
@@ -741,6 +785,23 @@ function applyBranchTheme(problemKey) {
   else if (problemKey === 'criticism') document.body.classList.add('theme-branch-4');
 }
 
+/* ===== THANH TIẾN TRÌNH HÀNH TRÌNH (vấn đề → cảm xúc → nguyên nhân → giải pháp → chữa lành) =====
+   Chỉ phục vụ hiển thị trực quan "flowtree" giống sơ đồ nhánh, không ảnh hưởng tới state machine gốc. */
+const FLOW_STEPS = ['problem', 'emotion', 'cause', 'solution', 'followup'];
+function setFlowProgress(step) {
+  const wrap = document.getElementById('flowProgress');
+  if (!wrap) return;
+  if (!step) { wrap.classList.remove('show'); return; }
+  wrap.classList.add('show');
+  const idx = FLOW_STEPS.indexOf(step);
+  wrap.querySelectorAll('.fp-step').forEach((el, i) => {
+    el.classList.remove('active', 'done');
+    if (i < idx) el.classList.add('done');
+    else if (i === idx) el.classList.add('active');
+  });
+  wrap.querySelectorAll('.fp-arrow').forEach((el, i) => el.classList.toggle('done', i < idx));
+}
+
 /* ===== AVATAR CÂY MẦM THAY ĐỔI THEO CẢM XÚC =====
    Cây mầm "lớn lên" theo hành trình: 🌿 lắng nghe → 🍂/🥀 buồn → 🌻/🌸 chữa lành → 🌳 vui vẻ.
    Tin nhắn cũ giữ nguyên avatar cũ để học sinh nhìn lại được hành trình cảm xúc của mình. */
@@ -767,147 +828,169 @@ function updateAvatarMood(moodClass, faceEmoji = '😊', plantEmoji = '🌿') {
    VẤN ĐỀ → CẢM XÚC (3/nhánh) → NGUYÊN NHÂN (riêng theo từng cảm xúc) → GIẢI PHÁP (riêng theo từng nguyên nhân) → HỎI LẠI CẢM XÚC */
 const treeData = {
   low_test_result: {
-    label: '1. Kết quả kiểm tra / thi thử chưa cao', icon: '📉',
+    label: '1. Kết quả thi/bài kiểm tra không cao', icon: '📉',
     start: { mood: 'mood-listening', face: '🥺', plant: '🌿' },
     heal:  { mood: 'mood-healing', face: '😊', plant: '🌻' },
-    askEmotion: 'Tớ hiểu mà, nhìn điểm số không như mong đợi thật sự rất hụt hẫng. Lúc này cậu đang cảm thấy thế nào?',
+    askEmotion: 'Có nhiều học sinh đang gặp vấn đề giống bạn. Hiện bạn có cảm xúc thế nào?',
+    causeQ: 'Bạn hãy bình tĩnh và đối diện. Kết quả chưa cao của bạn do nguyên nhân gì?',
     emotions: [
-      { id: 'sad', title: 'Buồn chán, hụt hẫng', desc: 'Cảm giác thất vọng sau khi đã cố gắng', face: '😢', plant: '🍂', mood: 'mood-sad',
-        reply: 'Buồn vì đã cố gắng mà chưa được như ý là chuyện rất bình thường, điều đó cho thấy cậu thật sự quan tâm đến việc học.' },
-      { id: 'stressed', title: 'Căng thẳng, lo âu', desc: 'Áp lực điểm số đè nặng tâm trí', face: '😰', plant: '🌿', mood: 'mood-stress',
-        reply: 'Tớ biết cảm giác áp lực điểm số nặng nề lắm. Mình cùng thả lỏng vai một chút rồi gỡ từng nút thắt nhé.' },
-      { id: 'fear_parents', title: 'Sợ bố mẹ, thầy cô thất vọng', desc: 'Lo không biết nói với gia đình thế nào', face: '😟', plant: '🌱', mood: 'mood-worried',
-        reply: 'Cậu lo vì cậu thương bố mẹ và thầy cô – đó là một trái tim rất tốt đó.' }
+      { id: 'sad', title: 'Buồn chán', desc: '', face: '😢', plant: '🍂', mood: 'mood-sad' },
+      { id: 'stressed', title: 'Căng thẳng', desc: '', face: '😰', plant: '🌿', mood: 'mood-stress' },
+      { id: 'disappointed', title: 'Hụt hẫng', desc: '', face: '😔', plant: '🥀', mood: 'mood-sad' },
+      { id: 'upset', title: 'Thất vọng', desc: '', face: '😞', plant: '🥀', mood: 'mood-sad' },
+      { id: 'selfblame', title: 'Tự trách bản thân', desc: '', face: '😟', plant: '🌱', mood: 'mood-worried' }
     ],
     causes: {
       sad: [
-        ['unprepared', 'Chuẩn bị bài chưa kĩ', 'Ôn chưa chắc phần kiến thức cốt lõi'],
-        ['careless', 'Làm bài bị sai sót, mất điểm oan', 'Biết làm nhưng đọc nhầm đề, tính sai']
+        ['unprepared', 'Chuẩn bị bài chưa kĩ'],
+        ['ineffective', 'Phương pháp học chưa hiệu quả'],
+        ['exam_mindset', 'Tâm lý khi làm bài'],
+        ['careless', 'Thiếu kĩ năng làm bài, mắc lỗi sai không đáng có']
       ],
       stressed: [
-        ['ineffective', 'Phương pháp học chưa đúng', 'Học nhiều nhưng chưa hiệu quả'],
-        ['exam_nerves', 'Hồi hộp, run khi vào phòng thi', 'Quên hết kiến thức dù đã ôn kỹ']
+        ['unprepared', 'Chuẩn bị bài chưa kĩ'],
+        ['ineffective', 'Phương pháp học chưa hiệu quả'],
+        ['exam_mindset', 'Tâm lý khi làm bài'],
+        ['careless', 'Thiếu kĩ năng làm bài, mắc lỗi sai không đáng có']
       ],
-      fear_parents: [
-        ['high_expect', 'Kỳ vọng của gia đình quá cao', 'Cảm giác phải luôn đạt điểm thật tốt'],
-        ['hide_result', 'Không biết cách nói ra kết quả', 'Muốn giấu vì sợ bị la mắng']
+      disappointed: [
+        ['unprepared', 'Chuẩn bị bài chưa kĩ'],
+        ['ineffective', 'Phương pháp học chưa hiệu quả'],
+        ['exam_mindset', 'Tâm lý khi làm bài'],
+        ['careless', 'Thiếu kĩ năng làm bài, mắc lỗi sai không đáng có']
+      ],
+      upset: [
+        ['unprepared', 'Chuẩn bị bài chưa kĩ'],
+        ['ineffective', 'Phương pháp học chưa hiệu quả'],
+        ['exam_mindset', 'Tâm lý khi làm bài'],
+        ['careless', 'Thiếu kĩ năng làm bài, mắc lỗi sai không đáng có']
+      ],
+      selfblame: [
+        ['unprepared', 'Chuẩn bị bài chưa kĩ'],
+        ['ineffective', 'Phương pháp học chưa hiệu quả'],
+        ['exam_mindset', 'Tâm lý khi làm bài'],
+        ['careless', 'Thiếu kĩ năng làm bài, mắc lỗi sai không đáng có']
       ]
     },
     solutions: {
-      unprepared: "🌸 Một bài kiểm tra chưa cao không có nghĩa là cậu kém, chỉ là phần kiến thức đó cần thêm chút thời gian thôi.\n• Xem lại bài làm, khoanh câu sai và ghi chú vì sao sai.\n• Chia phần hổng thành từng mục nhỏ, mỗi ngày ôn 1 mục trong 20–30 phút.\n• Lần tới bắt đầu ôn trước 3–4 ngày thay vì dồn vào đêm cuối nhé.",
-      careless: "🌸 Mất điểm vì sai sót nghĩa là cậu thật ra đã biết cách làm rồi – đây là điểm sáng đó!\n• Tập thói quen gạch chân từ khóa khi đọc đề.\n• Chừa 5 phút cuối giờ để soát lại phép tính và đơn vị.\n• Ghi một “sổ lỗi sai” để xem lại trước mỗi bài kiểm tra.",
-      ineffective: "🌸 Học nhiều mà chưa hiệu quả thì mình thử thay đổi cách tiếp cận nha.\n• Lập sơ đồ tư duy hoặc thẻ ghi nhớ cho từng chương.\n• Thử tự giảng lại bài cho bạn hoặc cho chính mình nghe.\n• Làm đề luyện tập thay vì chỉ đọc lại vở – não sẽ nhớ lâu hơn.",
-      exam_nerves: "🌸 Run khi vào phòng thi là phản ứng rất tự nhiên của cơ thể, không phải vì cậu yếu đâu.\n• Trước giờ thi: hít vào 4 giây – giữ 4 giây – thở ra 6 giây, lặp lại 3 lần.\n• Làm câu dễ trước để lấy lại bình tĩnh.\n• Ở nhà, tập làm đề có bấm giờ để quen với cảm giác phòng thi.",
-      high_expect: "🌸 Bố mẹ, thầy cô kỳ vọng vì tin ở cậu, nhưng cậu không cần phải hoàn hảo đâu.\n• Chọn lúc mọi người vui vẻ để kể về kết quả, kèm điều cậu sẽ làm để cải thiện.\n• Nói thật cảm xúc: “Con cũng buồn và con đang cố gắng”.\n• Đặt mục tiêu vừa sức cho lần sau, ví dụ tăng thêm 0,5–1 điểm.",
-      hide_result: "🌸 Giấu kết quả chỉ làm cậu lo lâu hơn thôi. Nói ra sớm sẽ nhẹ lòng hơn nhiều đó.\n• Tập trước câu mở đầu: “Con có chuyện muốn kể, con hơi lo…”.\n• Nhờ anh chị hoặc thầy cô chủ nhiệm hỗ trợ nếu thấy khó nói.\n• Mang theo kế hoạch ôn tập để mọi người thấy cậu đang nghiêm túc."
+      unprepared: "Nếu đã sẵn sàng đối diện, bạn nên:\n• Ôn lại phần kiến thức chưa nắm chắc\n• Chia nhỏ nhiệm vụ học tập để hiểu từng phần kiến thức\n• Phân loại lỗi sai, tìm cách khắc phục\n• Hỏi thêm thầy cô, học từ bạn bè",
+      ineffective: "Hãy đối diện để thay đổi:\n• Đặt mục tiêu cụ thể cho mỗi hoạt động\n• Ghi chép thông minh (sơ đồ tư duy, từ khóa...)\n• Sử dụng thẻ ghi nhớ để tự kiểm tra",
+      exam_mindset: "Bạn hãy đối diện để cải thiện:\n• Chia nhỏ chu kỳ ôn tập\n• Cách ly nguồn gây xao nhãng (điện thoại, MXH...)\n• Tự bấm giờ thi thử, làm quen cảm giác hồi hộp\n• Hít thở sâu, lấy lại bình tĩnh",
+      careless: "Đối diện để sửa sai:\n• Đọc kỹ đề, gạch chân từ khóa, viết điều kiện ra nháp...\n• Lập sổ tay lỗi sai, tạo bộ lọc chống sót"
     }
   },
   overloaded: {
-    label: '2. Lịch học quá tải, nhiều bài tập dồn nén', icon: '📚',
+    label: '2. Lịch học quá tải, nhiều bài tập chưa hoàn thành', icon: '📚',
     start: { mood: 'mood-listening', face: '😮‍💨', plant: '🌿' },
     heal:  { mood: 'mood-healing', face: '😌', plant: '🌿' },
-    askEmotion: 'Nhiều bài vở dồn cùng một lúc thì ai cũng thấy ngộp thở cả. Cậu đang cảm thấy ra sao?',
+    askEmotion: 'Nhiều học sinh cũng đang gặp tình trạng giống bạn. Hiện bạn có cảm xúc thế nào?',
+    causeQ: 'Tôi hiểu cảm xúc đó của bạn. Tình trạng đó của bạn là do nguyên nhân gì?',
     emotions: [
-      { id: 'tired', title: 'Kiệt sức, mệt mỏi', desc: 'Cạn kiệt năng lượng vì chạy đua liên tục', face: '😩', plant: '🍂', mood: 'mood-tired',
-        reply: 'Cậu đã chạy một quãng đường dài rồi, mệt là tín hiệu cơ thể cần được nghỉ ngơi đó.' },
-      { id: 'giveup', title: 'Muốn buông bỏ', desc: 'Khối lượng việc quá lớn ngợp thở', face: '😞', plant: '🥀', mood: 'mood-sad',
-        reply: 'Muốn buông xuôi khi quá tải là cảm giác nhiều bạn cũng từng trải qua. Cậu không cô đơn đâu.' },
-      { id: 'chaotic', title: 'Rối bời, không biết bắt đầu từ đâu', desc: 'Đầu óc quay cuồng vì quá nhiều việc', face: '😵‍💫', plant: '🌿', mood: 'mood-stress',
-        reply: 'Khi có quá nhiều việc, đầu óc rối là chuyện dễ hiểu. Mình cùng gỡ từng sợi một nhé.' }
+      { id: 'tired', title: 'Mệt mỏi', desc: '', face: '😩', plant: '🍂', mood: 'mood-tired' },
+      { id: 'giveup', title: 'Muốn buông bỏ', desc: '', face: '😞', plant: '🥀', mood: 'mood-sad' },
+      { id: 'pressure', title: 'Áp lực', desc: '', face: '😰', plant: '🌿', mood: 'mood-stress' },
+      { id: 'later', title: 'Để sau rồi tính', desc: '', face: '😵‍💫', plant: '🌿', mood: 'mood-stress' }
     ],
     causes: {
       tired: [
-        ['lack_sleep', 'Thức khuya, ngủ không đủ giấc', 'Học tới khuya nên sáng dậy uể oải'],
-        ['too_many_classes', 'Học thêm quá nhiều nơi', 'Lịch kín từ sáng tới tối, không có lúc nghỉ']
+        ['perfectionism', 'Tâm lý cầu toàn: muốn mọi thứ hoàn hảo nhưng không đủ thời gian'],
+        ['time_mgmt', 'Thiếu kỹ năng quản lý thời gian'],
+        ['high_expect', 'Áp lực kỳ vọng quá lớn']
       ],
       giveup: [
-        ['perfection', 'Tâm lý cầu toàn', 'Muốn mọi thứ hoàn hảo nhưng quá tải thời gian'],
-        ['no_motivation', 'Mất động lực học', 'Học mãi mà chẳng thấy tiến bộ']
+        ['perfectionism', 'Tâm lý cầu toàn: muốn mọi thứ hoàn hảo nhưng không đủ thời gian'],
+        ['time_mgmt', 'Thiếu kỹ năng quản lý thời gian'],
+        ['high_expect', 'Áp lực kỳ vọng quá lớn']
       ],
-      chaotic: [
-        ['time_mgmt', 'Quản lý thời gian kém', 'Chưa biết cách sắp xếp việc nào làm trước'],
-        ['procrastinate', 'Hay trì hoãn, nước đến chân mới nhảy', 'Lướt điện thoại rồi bài dồn lại']
+      pressure: [
+        ['perfectionism', 'Tâm lý cầu toàn: muốn mọi thứ hoàn hảo nhưng không đủ thời gian'],
+        ['time_mgmt', 'Thiếu kỹ năng quản lý thời gian'],
+        ['high_expect', 'Áp lực kỳ vọng quá lớn']
+      ],
+      later: [
+        ['perfectionism', 'Tâm lý cầu toàn: muốn mọi thứ hoàn hảo nhưng không đủ thời gian'],
+        ['time_mgmt', 'Thiếu kỹ năng quản lý thời gian'],
+        ['high_expect', 'Áp lực kỳ vọng quá lớn']
       ]
     },
     solutions: {
-      lack_sleep: "🌸 Thiếu ngủ thì học bao nhiêu cũng khó vào, nên ngủ đủ cũng là một phần của việc học nha.\n• Cố gắng đi ngủ trước 23h, ngủ đủ 7–8 tiếng.\n• Cất điện thoại xa giường 30 phút trước khi ngủ.\n• Buồn ngủ khi học thì chợp mắt 15–20 phút rồi học tiếp.",
-      too_many_classes: "🌸 Lịch học kín mít khiến cậu không còn chỗ để thở – mệt là điều dễ hiểu.\n• Viết ra toàn bộ lịch học thêm, đánh dấu lớp nào thật sự cần.\n• Thử nói chuyện với bố mẹ về việc giảm bớt 1 lớp chưa hiệu quả.\n• Giữ ít nhất một buổi mỗi tuần để nghỉ ngơi hoặc làm điều mình thích.",
-      perfection: "🌸 Thả lỏng nào! “Xong” quan trọng hơn “hoàn hảo” đó.\n• Chia nhỏ nhiệm vụ và đặt mức “đủ tốt” cho từng việc.\n• Cho phép bản thân nghỉ 15 phút sau mỗi 45 phút học.\n• Bài làm còn chỗ chưa đẹp vẫn là một bài làm đáng quý.",
-      no_motivation: "🌸 Mất động lực không có nghĩa là cậu lười, có thể cậu chỉ đang quá mệt thôi.\n• Nhớ lại lý do cậu muốn học: một ước mơ, một ngôi trường, một người cậu muốn làm vui.\n• Đặt mục tiêu thật nhỏ cho hôm nay và tự thưởng khi hoàn thành.\n• Ghi lại tiến bộ mỗi tuần để thấy mình đã đi được bao xa.",
-      time_mgmt: "🌸 Mình cùng sắp xếp lại lịch trình nha.\n• Liệt kê tất cả bài tập, xếp theo hạn nộp và độ quan trọng.\n• Làm việc gấp và quan trọng nhất trước.\n• Áp dụng quy tắc 5 phút: chỉ cần bắt đầu 5 phút, phần còn lại sẽ dễ hơn.",
-      procrastinate: "🌸 Ai cũng từng trì hoãn cả, quan trọng là mình bắt đầu lại ngay bây giờ.\n• Để điện thoại ở phòng khác hoặc bật chế độ tập trung khi học.\n• Học theo Pomodoro: 25 phút học – 5 phút nghỉ.\n• Làm bài khó nhất vào lúc đầu óc tỉnh táo nhất trong ngày."
+      perfectionism: "Thay vì né tránh, bạn hãy:\n• Thay đổi tư duy, coi lỗi sai là cơ hội để bứt phá\n• Tập trung vào nỗ lực, không chỉ nhìn vào kết quả\n• Điều chỉnh mục tiêu vừa sức; chia sẻ với bạn bè, thầy cô",
+      time_mgmt: "Đối diện để cải thiện:\n• Sắp xếp thời gian khoa học, xử lí nhiệm vụ ưu tiên trước\n• Chia nhỏ nhiệm vụ, có giới hạn thời gian hoàn thành\n• Tạo không gian tập trung, có đánh giá cuối tuần\n• Áp dụng quy tắc 5 phút để phá vỡ sự trì hoãn ban đầu",
+      high_expect: "Hãy đối diện để thay đổi:\n• Chia sẻ với thầy cô, bạn bè về những lo âu, mệt mỏi...\n• Chia nhỏ mục tiêu: biến nhiệm vụ lớn thành bước nhỏ để thực hiện\n• Cân bằng giữa học và nghỉ ngơi, tìm kênh xả stress: thể thao, viết nhật ký,..."
     }
   },
   difficult: {
-    label: '3. Gặp bài khó hoặc chưa hiểu kiến thức', icon: '📖',
+    label: '3. Gặp bài khó/kiến thức chưa hiểu', icon: '📖',
     start: { mood: 'mood-listening', face: '🤔', plant: '🌿' },
     heal:  { mood: 'mood-healing', face: '💡', plant: '🌼' },
-    askEmotion: 'Gặp bài khó mà mãi chưa hiểu thì dễ nản lắm. Cảm xúc của cậu bây giờ thế nào?',
+    askEmotion: 'Bạn đang gặp phải tình trạng né tránh của nhiều học sinh. Bạn có cảm xúc thế nào?',
+    causeQ: 'Né tránh không phải là giải pháp. Tình trạng đó của bạn do nguyên nhân gì?',
     emotions: [
-      { id: 'anxious_diff', title: 'Lo lắng, bế tắc', desc: 'Không biết bắt đầu gỡ rối từ đâu', face: '😣', plant: '🌿', mood: 'mood-worried',
-        reply: 'Bế tắc trước một bài khó không có nghĩa là cậu không giỏi, chỉ là mình chưa tìm ra lối vào thôi.' },
-      { id: 'giveup_diff', title: 'Muốn từ bỏ', desc: 'Cảm giác bài tập quá sức', face: '😔', plant: '🥀', mood: 'mood-sad',
-        reply: 'Cảm giác quá sức thật mệt mỏi. Nhưng cậu đã ở đây tìm cách, nghĩa là cậu vẫn chưa bỏ cuộc đâu.' },
-      { id: 'shy_ask', title: 'Ngại hỏi, sợ bị cười', desc: 'Không dám hỏi thầy cô, bạn bè', face: '😶', plant: '🌱', mood: 'mood-shy',
-        reply: 'Ngại hỏi là cảm giác rất nhiều bạn học sinh gặp phải. Tớ sẽ giúp cậu tự tin hơn nhé.' }
+      { id: 'tired_diff', title: 'Mệt mỏi', desc: '', face: '😩', plant: '🍂', mood: 'mood-tired' },
+      { id: 'worried_diff', title: 'Lo lắng', desc: '', face: '😣', plant: '🌿', mood: 'mood-worried' },
+      { id: 'stressed_diff', title: 'Căng thẳng', desc: '', face: '😰', plant: '🌿', mood: 'mood-stress' },
+      { id: 'giveup_diff', title: 'Buông bỏ', desc: '', face: '😔', plant: '🥀', mood: 'mood-sad' }
     ],
     causes: {
-      anxious_diff: [
-        ['fear_failure', 'Sợ thất bại, thiếu tự tin', 'Lo lắng mình không thể làm được'],
-        ['lost_basics', 'Bị hổng kiến thức cũ', 'Phần trước chưa chắc nên phần sau không hiểu']
+      tired_diff: [
+        ['low_confidence', 'Sự thất bại, thiếu niềm tin vào bản thân'],
+        ['score_pressure', 'Áp lực điểm số, nỗi sợ lỗ hổng kiến thức'],
+        ['lack_guidance', 'Thiếu sự hướng dẫn để giải quyết bài khó']
+      ],
+      worried_diff: [
+        ['low_confidence', 'Sự thất bại, thiếu niềm tin vào bản thân'],
+        ['score_pressure', 'Áp lực điểm số, nỗi sợ lỗ hổng kiến thức'],
+        ['lack_guidance', 'Thiếu sự hướng dẫn để giải quyết bài khó']
+      ],
+      stressed_diff: [
+        ['low_confidence', 'Sự thất bại, thiếu niềm tin vào bản thân'],
+        ['score_pressure', 'Áp lực điểm số, nỗi sợ lỗ hổng kiến thức'],
+        ['lack_guidance', 'Thiếu sự hướng dẫn để giải quyết bài khó']
       ],
       giveup_diff: [
-        ['score_pressure', 'Áp lực sợ mất gốc', 'Sợ không theo kịp tiến độ của bạn bè'],
-        ['self_doubt', 'Nghĩ mình không đủ thông minh', 'Cho rằng mình “không có khiếu” môn này']
-      ],
-      shy_ask: [
-        ['fear_look_dumb', 'Sợ bị nghĩ là học kém', 'Lo câu hỏi của mình “ngớ ngẩn”'],
-        ['no_one_to_ask', 'Không biết hỏi ai', 'Chưa có bạn học cùng hay người hướng dẫn']
+        ['low_confidence', 'Sự thất bại, thiếu niềm tin vào bản thân'],
+        ['score_pressure', 'Áp lực điểm số, nỗi sợ lỗ hổng kiến thức'],
+        ['lack_guidance', 'Thiếu sự hướng dẫn để giải quyết bài khó']
       ]
     },
     solutions: {
-      fear_failure: "🌸 Bình tĩnh nào, so sánh bản thân với chính mình của hôm qua là đủ rồi. Mọi bài khó đều có cách giải.\n• Đọc lại đề thật chậm, viết ra những gì đề đã cho.\n• Làm từng bước nhỏ, sai thì sửa – sai là một phần của việc học.\n• Khen bản thân mỗi khi gỡ được một phần của bài.",
-      lost_basics: "🌸 Hổng kiến thức cũ là chuyện nhiều bạn gặp, và hoàn toàn có thể lấp lại được.\n• Mở lại bài cơ bản của phần trước trong sách giáo khoa.\n• Xem video bài giảng ngắn về phần đó rồi làm bài tập dễ trước.\n• Mỗi ngày dành 15 phút “vá” một lỗ hổng nhỏ.",
-      score_pressure: "🌸 Ngừng so sánh với người khác nhé, mỗi người có tốc độ riêng.\n• Chủ động hỏi thầy cô và bạn bè phần chưa hiểu.\n• Đặt mục tiêu theo tiến độ của chính mình, không phải của bạn bè.\n• Học chắc từng phần còn hơn chạy theo mà không hiểu.",
-      self_doubt: "🌸 Không ai sinh ra “không có khiếu” cả – sự hiểu biết lớn lên cùng luyện tập.\n• Đổi câu “mình không làm được” thành “mình chưa làm được”.\n• Nhớ lại một bài trước đây cậu từng thấy khó nhưng giờ đã làm được.\n• Bắt đầu từ bài tập mức dễ để lấy lại sự tự tin.",
-      fear_look_dumb: "🌸 Câu hỏi của cậu có khi cũng là câu hỏi của nhiều bạn khác. Dám hỏi là dấu hiệu của người ham học.\n• Viết câu hỏi ra giấy trước để hỏi rõ ràng hơn.\n• Hỏi thầy cô sau giờ học nếu ngại hỏi trước lớp.\n• Mở đầu bằng: “Em chưa hiểu chỗ này, thầy/cô giải thích giúp em được không ạ?”",
-      no_one_to_ask: "🌸 Cậu không phải tự xoay xở một mình đâu, có nhiều người sẵn sàng giúp cậu.\n• Rủ 1–2 bạn lập nhóm học, mỗi người mạnh một phần.\n• Nhờ anh chị lớp trên hoặc thầy cô bộ môn.\n• Tìm video bài giảng uy tín cho phần chưa hiểu."
+      low_confidence: "Hãy đối diện để thay đổi:\n• Viết nhật ký thành tựu, so sánh bản thân với quá khứ thay vì nhìn kết quả của bạn bè\n• Chia nhỏ mục tiêu: biến nhiệm vụ lớn thành bước nhỏ dễ thực hiện\n• Tìm kiếm nhóm bạn tích cực; chia sẻ với thầy cô, gia đình về những lo lắng",
+      score_pressure: "Hãy đối diện để thay đổi:\n• Ngừng so sánh điểm số với bạn bè để tạo áp lực tiêu cực\n• Hướng mục tiêu: hiểu sâu kiến thức, thay vì học vẹt điểm cao\n• Đặt mục tiêu vừa sức, quản lý thời gian phù hợp\n• Khoanh vùng lỗ hổng, học lại từ căn bản, tận dụng công cụ số",
+      lack_guidance: "Hãy đối diện để thay đổi:\n• Khai thác học liệu số, tham gia các CLB, nhóm ôn thi trực tuyến\n• Chủ động kết nối thầy cô, bạn bè\n• Rèn luyện tự học: tìm sách có lời giải chi tiết để tham khảo và học hỏi..."
     }
   },
   criticism: {
-    label: '4. Bị nhận xét tiêu cực hoặc bị phê bình', icon: '😔',
+    label: '4. Bị nhận xét về điểm yếu (phê bình)', icon: '😔',
     start: { mood: 'mood-listening', face: '😟', plant: '🌿' },
     heal:  { mood: 'mood-healing', face: '🤗', plant: '🌸' },
-    askEmotion: 'Bị nhận xét như vậy chắc cậu khó chịu lắm. Tớ ở đây nghe cậu nè. Cậu đang cảm thấy thế nào?',
+    askEmotion: 'Nhiều học sinh đang né tránh giống bạn. Khi đó, bạn có cảm xúc thế nào?',
+    causeQ: 'Tôi rất hiểu cảm xúc đó của bạn. Tình trạng đó của bạn do nguyên nhân gì?',
     emotions: [
-      { id: 'ashamed', title: 'Xấu hổ, tổn thương', desc: 'Ngại ngùng khi khuyết điểm bị đem ra nói', face: '😳', plant: '🥀', mood: 'mood-shy',
-        reply: 'Cảm giác xấu hổ thật khó chịu, nhưng nó không nói lên con người thật của cậu.' },
-      { id: 'unsettled', title: 'Bất an, lo âu', desc: 'Sợ ánh mắt phán xét xung quanh', face: '😟', plant: '🌿', mood: 'mood-worried',
-        reply: 'Lo lắng sau khi bị nhận xét là điều rất bình thường. Mình cùng làm dịu nó từ từ nhé.' },
-      { id: 'angry', title: 'Ấm ức, bực bội', desc: 'Thấy lời nhận xét chưa công bằng', face: '😤', plant: '🌿', mood: 'mood-stress',
-        reply: 'Ấm ức cũng là một cảm xúc cần được lắng nghe. Cậu cứ để nó lắng xuống một chút đã nha.' }
+      { id: 'ashamed', title: 'Xấu hổ', desc: '', face: '😳', plant: '🥀', mood: 'mood-shy' },
+      { id: 'unsettled', title: 'Bất an', desc: '', face: '😟', plant: '🌿', mood: 'mood-worried' },
+      { id: 'anxious', title: 'Lo âu', desc: '', face: '😣', plant: '🌿', mood: 'mood-worried' }
     ],
     causes: {
       ashamed: [
-        ['fear_judgement', 'Sợ bị phán xét, cười chê', 'Áp lực giữ hình ảnh bản thân'],
-        ['public_criticism', 'Bị nhắc nhở trước cả lớp', 'Cảm giác mọi người đều nhìn mình']
+        ['fear_judgement', 'Sợ bị phán xét, cười chê'],
+        ['cover_insecurity', 'Muốn che đậy cảm giác bất an'],
+        ['low_selfesteem', 'Thiếu sự tự tin vào bản thân']
       ],
       unsettled: [
-        ['overthinking', 'Cứ nghĩ mãi về lời nhận xét', 'Câu nói cứ lặp đi lặp lại trong đầu'],
-        ['fear_repeat', 'Sợ lần sau lại bị như vậy', 'Lo mình sẽ tiếp tục mắc lỗi']
+        ['fear_judgement', 'Sợ bị phán xét, cười chê'],
+        ['cover_insecurity', 'Muốn che đậy cảm giác bất an'],
+        ['low_selfesteem', 'Thiếu sự tự tin vào bản thân']
       ],
-      angry: [
-        ['unfair', 'Cảm thấy bị hiểu lầm', 'Người nói chưa hiểu hết hoàn cảnh của mình'],
-        ['harsh_words', 'Lời lẽ quá nặng nề', 'Nội dung có thể đúng nhưng cách nói làm mình đau']
+      anxious: [
+        ['fear_judgement', 'Sợ bị phán xét, cười chê'],
+        ['cover_insecurity', 'Muốn che đậy cảm giác bất an'],
+        ['low_selfesteem', 'Thiếu sự tự tin vào bản thân']
       ]
     },
     solutions: {
-      fear_judgement: "🌸 Lời chê bai không định nghĩa được giá trị của cậu. Hãy bình thường hóa lỗi sai và tiếp tục tiến bước!\n• Nhớ rằng mọi người thường bận nghĩ về mình hơn là để ý lỗi của cậu.\n• Viết ra 3 điểm tốt của chính mình.\n• Tập trung vào điều mình có thể làm tốt hơn lần sau.",
-      public_criticism: "🌸 Bị nhắc trước cả lớp thì ai cũng ngượng. Cảm giác này sẽ qua, và nó không làm cậu kém đi.\n• Cho mình vài phút hít thở, uống ngụm nước để bình tĩnh.\n• Nếu cần, gặp riêng thầy cô sau giờ học để hiểu rõ hơn.\n• Kể với một người bạn thân để thấy nhẹ lòng hơn.",
-      overthinking: "🌸 Nghĩ mãi về một câu nói giống như tua đi tua lại một đoạn phim – mình tắt nó đi nhé.\n• Viết lời nhận xét ra giấy, tách phần góp ý hữu ích và phần chỉ là cảm xúc.\n• Giữ lại phần hữu ích, bỏ phần còn lại.\n• Làm một việc cậu thích trong 15 phút để tâm trí được nghỉ.",
-      fear_repeat: "🌸 Lo lắng cho lần sau là vì cậu muốn làm tốt hơn – đó là tín hiệu tốt đó.\n• Xác định rõ điều cần điều chỉnh là gì.\n• Lập một kế hoạch nhỏ để sửa từng chút một.\n• Mắc lỗi một lần không có nghĩa là sẽ mắc mãi.",
-      unfair: "🌸 Thấy bị hiểu lầm thì ấm ức là chuyện bình thường, cảm xúc của cậu đáng được lắng nghe.\n• Đợi bình tĩnh rồi hãy giải thích, tránh nói lúc đang giận.\n• Trình bày nhẹ nhàng: “Em muốn giải thích thêm một chút ạ…”.\n• Nếu vẫn chưa ổn, nhờ thầy cô chủ nhiệm hoặc bố mẹ hỗ trợ.",
-      harsh_words: "🌸 Góp ý có thể đúng nhưng cách nói làm cậu đau – cả hai điều đó đều có thật.\n• Tách nội dung ra khỏi cách nói: điều gì mình có thể học được?\n• Cho phép bản thân buồn một chút, rồi thả nó đi.\n• Nếu lời nói làm cậu tổn thương nhiều lần, hãy kể với người lớn cậu tin tưởng."
+      fear_judgement: "Né tránh không phải là giải pháp. Bạn hãy đối diện để thay đổi:\n• Bình thường hóa lỗi sai, nhìn vào sự tiến bộ mỗi ngày của bản thân\n• Tập đối diện từ việc nhỏ: xung phong sửa bài để làm quen với nhận xét trước tập thể\n• Lắng nghe tích cực, thiết lập mục tiêu vừa sức\n• Xây dựng nhóm bạn cùng ôn luyện, chia lượng kiến thức lớn thành các phần nhỏ dễ thực hiện",
+      cover_insecurity: "Né tránh không phải là giải pháp. Bạn hãy đối diện để thay đổi:\n• Bình thường hóa lỗi sai, nhìn vào sự tiến bộ mỗi ngày của bản thân\n• Tập đối diện từ việc nhỏ: xung phong sửa bài để làm quen với nhận xét trước tập thể\n• Lắng nghe tích cực, thiết lập mục tiêu vừa sức\n• Xây dựng nhóm bạn cùng ôn luyện, chia lượng kiến thức lớn thành các phần nhỏ dễ thực hiện",
+      low_selfesteem: "Né tránh không phải là giải pháp. Bạn hãy đối diện để thay đổi:\n• Bình thường hóa lỗi sai, nhìn vào sự tiến bộ mỗi ngày của bản thân\n• Tập đối diện từ việc nhỏ: xung phong sửa bài để làm quen với nhận xét trước tập thể\n• Lắng nghe tích cực, thiết lập mục tiêu vừa sức\n• Xây dựng nhóm bạn cùng ôn luyện, chia lượng kiến thức lớn thành các phần nhỏ dễ thực hiện"
     }
   }
 };
@@ -1170,12 +1253,36 @@ function closeIntro() {
   input.focus();
 }
 
+/* Nạp sẵn danh sách giọng đọc của máy/trình duyệt (một số trình duyệt nạp trễ nên phải nghe thêm voiceschanged) */
+let ttsVoices = [];
+function loadTtsVoices() {
+  if (!('speechSynthesis' in window)) return;
+  ttsVoices = window.speechSynthesis.getVoices();
+}
+if ('speechSynthesis' in window) {
+  loadTtsVoices();
+  window.speechSynthesis.onvoiceschanged = loadTtsVoices;
+}
+/* Chọn đúng giọng bản địa theo ngôn ngữ (vd. giọng Việt thật) thay vì để trình duyệt tự rơi về giọng Anh mặc định */
+function pickTtsVoice(langCode) {
+  if (!ttsVoices.length) loadTtsVoices();
+  if (!ttsVoices.length) return null;
+  const want = (langCode || 'vi-VN').toLowerCase();
+  const base = want.split('-')[0];
+  return ttsVoices.find(v => v.lang && v.lang.toLowerCase() === want)
+      || ttsVoices.find(v => v.lang && v.lang.toLowerCase().startsWith(base + '-'))
+      || ttsVoices.find(v => v.lang && v.lang.toLowerCase().startsWith(base))
+      || null;
+}
+
 function readStoryAloud(text, langCode = 'vi-VN') {
   if (!('speechSynthesis' in window)) return;
   window.speechSynthesis.cancel();
   const cleanText = text.replace(/[*#_~`[\]()•]/g, '').replace(/\p{Extended_Pictographic}|\u200D|\uFE0F/gu, '').trim();
   const speech = new SpeechSynthesisUtterance(cleanText);
-  speech.lang = langCode; 
+  speech.lang = langCode;
+  const nativeVoice = pickTtsVoice(langCode);
+  if (nativeVoice) speech.voice = nativeVoice; // ép đúng giọng bản địa (vd. vi-VN) nếu máy có sẵn
   speech.rate = 0.90;
   window.speechSynthesis.speak(speech);
 }
@@ -1223,10 +1330,23 @@ function options(arr, isDefault = false) {
   // Khóa các nhóm lựa chọn cũ chưa bấm, chỉ nhóm mới nhất còn dùng được
   chat.querySelectorAll('.opt:not(:disabled)').forEach(x => x.disabled = true);
   let w = document.createElement('div'); w.className = 'options ' + (isDefault ? 'default-opts' : '');
-  arr.forEach(([v, t, d, icon]) => {
+  arr.forEach(([v, t, d, icon], i) => {
     let b = document.createElement('button'); b.className = 'opt ' + (isDefault ? '' : 'normal-opt');
+    b.style.setProperty('--oi', i); // thứ tự xuất hiện so le (stagger) cho hiệu ứng vip pro max
     b.innerHTML = `<div><strong>${t}</strong><span>${d || ''}</span></div> ${icon ? `<span style="font-size:22px; margin-left:10px">${icon}</span>` : ''}`;
-    b.onclick = () => {
+    b.onclick = (ev) => {
+      // Hiệu ứng gợn sóng (ripple) tại vị trí bấm
+      try {
+        const rect = b.getBoundingClientRect();
+        const size = Math.max(rect.width, rect.height);
+        const ripple = document.createElement('span');
+        ripple.className = 'opt-ripple';
+        ripple.style.width = ripple.style.height = size + 'px';
+        ripple.style.left = ((ev.clientX ?? rect.left + rect.width / 2) - rect.left - size / 2) + 'px';
+        ripple.style.top = ((ev.clientY ?? rect.top + rect.height / 2) - rect.top - size / 2) + 'px';
+        b.appendChild(ripple);
+        setTimeout(() => ripple.remove(), 550);
+      } catch (e) {}
       // Khóa nhóm lựa chọn vừa bấm để mỗi bước chỉ chọn 1 lần, luồng không bị nhảy lung tung
       w.querySelectorAll('.opt').forEach(x => x.disabled = true);
       b.classList.add('chosen');
@@ -1256,27 +1376,31 @@ function choose(v, t) {
       currentSessionTs = null; flowSent = false; logSession('problem', v);
       const branch = tb(v);
       applyBranchTheme(v);
+      setFlowProgress('emotion');
       updateAvatarMood(branch.start.mood, branch.start.face, branch.start.plant);
       msg(branch.askEmotion);
-      moodScale('before');
       options(branch.emotions.map(e => [e.id, e.title, e.desc, e.face]));
+      moodScale('before');
     } else if(state === 'emotion') {
       selectedEmotion = v; state = 'cause';
       logSession('emotion', v);
+      setFlowProgress('cause');
       const branch = tb(selectedProblem);
       const emo = branch.emotions.find(e => e.id === v);
       updateAvatarMood(emo.mood, emo.face, emo.plant);
-      msg(emo.reply + t_('causeQ'));
+      msg(branch.causeQ || t_('causeQ'));
       options(branch.causes[v]);
     } else if(state === 'cause') {
       state = 'followup';
       logSession('cause', v);
+      setFlowProgress('solution'); // bước 4: Giải pháp
       const branch = tb(selectedProblem);
       updateAvatarMood(branch.heal.mood, branch.heal.face, branch.heal.plant);
       let solutionText = branch.solutions[v] || Object.values(branch.solutions)[0] || t_('cheer');
       msg(solutionText + t_('afterSolution'));
       moodScale('after');
       options(followupOptions());
+      setTimeout(() => setFlowProgress('followup'), 1200); // bước 5: Chữa lành, sáng lên sau khi đọc giải pháp
     }
   }, 500);
 }
@@ -2106,6 +2230,7 @@ async function sendText() {
     if (d.suggestedProblem && treeData[d.suggestedProblem] && (state === 'problem' || state === 'followup')) {
       const b = tb(d.suggestedProblem);
       state = 'problem';
+      setFlowProgress('problem');
       options([[d.suggestedProblem, b.label, t_('o_topicGo'), b.icon], opt_('fu_new', 'o_topicOther', '↻')]);
       return;
     }
@@ -2126,11 +2251,13 @@ async function sendText() {
       updateAvatarMood(b.start.mood, b.start.face, b.start.plant);
       msg(t_('m_guess')(stripNo(b.label)), 'bot');
       state = 'problem';
+      setFlowProgress('problem');
       options([[guess, b.label, t_('o_topicGoLocal'), b.icon], opt_('fu_new', 'o_topicOther', '↻')]);
     } else {
       updateAvatarMood('mood-listening', '🤔', '🌿');
       msg(pickText('notUnderstood', userLang), 'bot', LANG_TTS[userLang] || 'vi-VN');
       state = 'problem';
+      setFlowProgress('problem');
       options(Object.keys(treeData).map(k => { const b = tb(k); return [k, b.label, '', b.icon]; }), true);
     }
   }
@@ -2357,12 +2484,14 @@ function initMic() {
 
 function startInitialFlow() {
   state = 'problem'; selectedProblem = null; selectedEmotion = null;
+  setFlowProgress('problem');
   msg(t_('startQ'));
   options(Object.keys(treeData).map(k => { const b = tb(k); return [k, b.label, '', b.icon]; }), true);
 }
 
 function restartInteractive() {
   document.body.classList.remove('theme-branch-1', 'theme-branch-2', 'theme-branch-3', 'theme-branch-4');
+  setFlowProgress(null);
   updateAvatarMood(DEFAULT_AVATAR.mood, DEFAULT_AVATAR.face, DEFAULT_AVATAR.plant);
   chat.innerHTML = `<div class="welcome"><h2>Chào cậu 💖</h2><p>Cậu đang gặp khó khăn gì? Hãy chọn hoặc chia sẻ với mình nhé.</p><p class="privacy-note">🔒 Tin nhắn cậu gõ hoặc nói được gửi tới AI để trả lời và không bị lưu lại. Nhà trường chỉ nhận số đếm ẩn danh (chủ đề đã chọn, điểm tâm trạng), không có tên hay nội dung tin nhắn. Góc nhỏ tâm sự là người bạn lắng nghe, không thay thế thầy cô, bố mẹ hay chuyên gia tâm lý.</p></div>`;
   startInitialFlow();
