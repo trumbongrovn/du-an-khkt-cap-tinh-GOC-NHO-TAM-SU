@@ -105,7 +105,7 @@ async function callGemini({ contents, systemInstruction, schema, maxOutputTokens
             systemInstruction,
             responseMimeType: "application/json",
             responseSchema: schema,
-            temperature: 0.7,
+            temperature: 0.9,
             maxOutputTokens,
             ...(CFG.thinkingLevel ? { thinkingConfig: { thinkingLevel: CFG.thinkingLevel } } : {}),
           },
@@ -440,7 +440,7 @@ BỐI CẢNH
 ${stepLine}
 
 CÁCH NÓI CHUYỆN
-- Khi nói tiếng Việt: xưng "tớ", gọi "cậu". Giọng thủ thỉ, mềm mỏng, dùng từ đệm "tớ hiểu mà", "cậu vất vả rồi", "nhé", "nha" một cách tự nhiên.
+- Khi nói tiếng Việt: xưng "tớ", gọi "cậu". Giọng vui tính, hài hước, lầy lội như bạn thân, biết đùa theo, chơi chữ, trêu nhẹ; khi học sinh buồn hoặc căng thẳng thì chuyển sang thủ thỉ, mềm mỏng, dùng từ đệm "tớ hiểu mà", "cậu vất vả rồi", "nhé", "nha" một cách tự nhiên.
 - 2–4 câu, tối đa khoảng 80 chữ (câu hỏi kiến thức cần giải thích thì tới khoảng 120 chữ, có thể 3–5 câu). Không dùng markdown hay gạch đầu dòng.
 - Luôn ĐỔI MỚI cách diễn đạt, từ ngữ và góc nhìn trong mỗi câu trả lời; tuyệt đối không lặp lại y hệt các câu trả lời trước đó dù học sinh hỏi lại cùng một ý.
 - Khi học sinh chia sẻ chuyện buồn: công nhận cảm xúc trước, rồi gợi ý MỘT việc nhỏ làm được ngay; có thể hỏi lại một câu nhẹ nhàng để học sinh kể tiếp.
@@ -451,7 +451,7 @@ ${lock ? `- NGÔN NGỮ BẮT BUỘC của lượt này: ${LOCK_NAME[lock]} ("${
 
 TIẾP NHẬN MỌI TIN NHẮN (rất quan trọng)
 - Tin nhắn nào cũng phải được đáp lại tử tế và có nội dung: kể cả nhảm, đùa, teencode, viết tắt, sai chính tả, chỉ có emoji, một chữ vô nghĩa ("skibidi", "alo", "?", "hmm"), hay chẳng liên quan gì đến chủ đề. Không bao giờ chỉ nói "tớ không hiểu" rồi dừng, không từ chối cụt lủn hay máy móc.
-- Đùa, nhảm, trêu: đùa lại nhẹ nhàng, dễ thương, rồi hỏi thăm hôm nay cậu ấy thế nào.
+- Đùa, nhảm, trêu: đùa lại thật duyên và hài hước, chơi theo đúng trò của học sinh (không đáp khô khan), rồi hỏi thăm hôm nay cậu ấy thế nào. Học sinh nhờ làm gì vui hoặc hữu ích (kể chuyện cười, đặt biệt danh, đố vui, viết câu đùa, giúp việc nhỏ…): cố gắng giúp trong khả năng, trừ khi vi phạm phần GIỚI HẠN. Khi học sinh đang buồn nặng thì không đùa.
 - Câu hỏi vui vẻ, tò mò về sinh học cơ thể hoặc "lầy lội" (vd chuyện mang thai, "con trai có sinh em bé được không"): đừng từ chối. Giải thích ngắn gọn, đúng khoa học (vd cơ thể nam giới tự nhiên không có tử cung và cơ quan mang thai) bằng giọng dí dỏm, thân thiện, không đi vào chi tiết không hợp lứa tuổi, rồi khéo léo dẫn về chuyện học tập hoặc tâm trạng của cậu ấy.
 - Câu hỏi kiến thức, bài tập, chuyện thường ngày (vd "1+1 bằng mấy", "thủ đô nước Pháp", "nay nên ăn gì"): trả lời ngắn gọn và đúng; với bài tập thì gợi ý cách nghĩ, các bước làm thay vì làm hộ toàn bộ; sau đó có thể hỏi thăm nhẹ.
 - Hỏi về chính bạn: thật thà nói mình là Cây Mầm, trợ lý AI của Góc nhỏ tâm sự, luôn sẵn lòng lắng nghe.
@@ -677,6 +677,15 @@ app.all("/api/admin-unban", requireAdmin, (req, res) => {
   res.json({ ok: true, removed });
 });
 
+/* ===================== Thống kê ẩn danh (khảo sát, chủ đề, cảm xúc) ===================== */
+const stats = new Map();
+app.post("/api/stats-event", (req, res) => {
+  if (rateLimited("st:" + (req.ip || "unknown"), 60)) return res.status(429).json({ ok: false });
+  const ev = String(req.body?.event || req.body?.type || "unknown").replace(/[^\w.-]/g, "").slice(0, 40) || "unknown";
+  if (stats.size < 200 || stats.has(ev)) stats.set(ev, (stats.get(ev) || 0) + 1);
+  res.json({ ok: true });
+});
+
 /* ===================== Endpoint kể truyện ngẫu nhiên ===================== */
 app.get("/api/story", (req, res) => {
   const last = Number(req.query.last);
@@ -741,4 +750,4 @@ const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log(`🚀 Góc nhỏ tâm sự: http://localhost:${port}`);
   console.log(`   Model: ${CFG.model} (dự phòng: ${CFG.fallbackModel}) · ${keyPool.length} API key · Khóa theo: ${CFG.banScope}`);
-});	
+});
