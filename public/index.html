@@ -77,22 +77,38 @@ body.dark-mode {
 }
 
 * { box-sizing: border-box; }
-body { margin: 0; font-family: 'Quicksand', 'Segoe UI', system-ui, -apple-system, Roboto, Arial, sans-serif; color: var(--text); background: var(--bg-grad); height: 100vh; display: flex; align-items: center; justify-content: center; transition: background 1.2s ease, color 0.5s ease; }
+body { margin: 0; font-family: 'Quicksand', 'Segoe UI', system-ui, -apple-system, Roboto, Arial, sans-serif; color: var(--text); background: var(--bg-grad); height: 100vh; display: flex; align-items: center; justify-content: center; transition: background 1.2s ease, color 0.5s ease; position: relative; overflow: hidden; }
+/* Hai quầng sáng mờ trôi chậm phía sau app, tự đổi màu theo theme nhánh / sáng-tối vì dùng var(--accent-glow) */
+body::before, body::after { content: ""; position: fixed; width: 55vmax; height: 55vmax; border-radius: 50%; filter: blur(90px); opacity: 0.55; z-index: 0; pointer-events: none; background: var(--accent-glow); transition: background 1.2s ease; animation: auraDrift 20s ease-in-out infinite alternate; }
+body::before { top: -16vmax; left: -16vmax; }
+body::after { bottom: -18vmax; right: -18vmax; animation-duration: 24s; animation-delay: -7s; }
+@keyframes auraDrift { from { transform: translate(0,0) scale(1); } to { transform: translate(6vmax, 4vmax) scale(1.18); } }
+@media (prefers-reduced-motion: reduce) { body::before, body::after { animation: none; } }
 button, input { font: inherit; color: var(--text); }
-.app { width: min(1000px, calc(100% - 20px)); height: 90vh; max-height: 850px; background: var(--card); border-radius: 36px; overflow: hidden; box-shadow: 0 25px 50px rgba(117, 85, 66, 0.15); border: 4px solid var(--element-bg); display: flex; flex-direction: column; transition: 0.5s; position: relative; }
+.app { width: min(1000px, calc(100% - 20px)); height: 90vh; max-height: 850px; background: var(--card); border-radius: 36px; overflow: hidden; box-shadow: 0 25px 50px rgba(117, 85, 66, 0.15); border: 4px solid var(--element-bg); display: flex; flex-direction: column; transition: 0.5s; position: relative; z-index: 1; animation: appIn 0.55s cubic-bezier(.22,1,.36,1) backwards; }
+@keyframes appIn { from { opacity: 0; transform: translateY(18px) scale(0.98); } to { opacity: 1; transform: none; } }
 .main { display: flex; flex-direction: column; height: 100%; }
-.top { height: 70px; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; background: var(--header-bg); border-bottom: 1px solid var(--line); transition: 0.3s; }
+.top { height: 70px; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; background: var(--header-bg); backdrop-filter: blur(14px) saturate(1.4); -webkit-backdrop-filter: blur(14px) saturate(1.4); border-bottom: 1px solid var(--line); transition: 0.3s; position: relative; z-index: 5; }
 .status { font-weight: 700; font-size: 15px; color: var(--text); display: flex; align-items: center; gap: 10px; }
-.streak-badge { background: rgba(232, 168, 124, 0.2); padding: 4px 10px; border-radius: 12px; font-size: 12px; color: #c47c48; font-weight: bold; border: 1px solid rgba(232, 168, 124, 0.4); }
+.streak-badge { background: rgba(232, 168, 124, 0.2); padding: 4px 10px; border-radius: 12px; font-size: 12px; color: #c47c48; font-weight: bold; border: 1px solid rgba(232, 168, 124, 0.4); transition: transform 0.3s cubic-bezier(.34,1.56,.64,1); }
+.streak-badge.pop { animation: streakPop 0.5s cubic-bezier(.34,1.56,.64,1); }
+@keyframes streakPop { 0% { transform: scale(1); } 45% { transform: scale(1.18); } 100% { transform: scale(1); } }
 
 .top-actions { display: flex; gap: 8px; align-items: center; }
 .top-actions button { background: var(--element-bg); border: 1px solid var(--line); border-radius: 20px; padding: 8px 16px; color: var(--muted); cursor: pointer; font-weight: 600; transition: 0.2s; }
 .top-actions button:hover { opacity: 0.8; }
+.top-actions button:active { transform: scale(0.94); }
+.theme-spin { animation: themeSpin 0.5s ease; }
+@keyframes themeSpin { from { transform: rotate(0deg) scale(1); } 50% { transform: rotate(180deg) scale(1.15); } to { transform: rotate(360deg) scale(1); } }
 .sos-btn { background: #ff6b6b !important; color: white !important; border-color: #ff5252 !important; }
 .sos-btn.alert { animation: pulseSos 1.2s infinite; box-shadow: 0 0 0 4px rgba(255,107,107,0.3); }
 @keyframes pulseSos { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
 
-.chat { flex: 1; overflow-y: auto; padding: 30px; scroll-behavior: smooth; }
+.chat { flex: 1; overflow-y: auto; padding: 30px; scroll-behavior: smooth; scrollbar-width: thin; scrollbar-color: var(--line) transparent; }
+.chat::-webkit-scrollbar { width: 8px; }
+.chat::-webkit-scrollbar-track { background: transparent; }
+.chat::-webkit-scrollbar-thumb { background: var(--line); border-radius: 99px; }
+.chat::-webkit-scrollbar-thumb:hover { background: var(--muted); }
 .welcome { text-align: center; margin: 10px auto 30px; animation: fadeIn 0.5s ease; }
 .welcome h2 { font-size: 26px; margin: 0 0 8px; color: var(--text); }
 .welcome p { margin: 0; color: var(--muted); line-height: 1.6; }
@@ -197,16 +213,20 @@ button, input { font: inherit; color: var(--text); }
 @media (max-width: 640px) { .fp-label { display: none; } .fp-step { padding: 7px 9px; } .fp-arrow { font-size: 12px; } }
 
 /* THANH NHẬP LIỆU & NÚT GỬI */
-.composer { padding: 20px 30px; background: var(--header-bg); border-top: 1px solid var(--line); transition: 0.3s; position: relative; display: flex; align-items: center; gap: 12px; }
+.composer { padding: 20px 30px; background: var(--header-bg); backdrop-filter: blur(14px) saturate(1.4); -webkit-backdrop-filter: blur(14px) saturate(1.4); border-top: 1px solid var(--line); transition: 0.3s; position: relative; z-index: 5; display: flex; align-items: center; gap: 12px; }
 .compose { flex: 1; display: flex; gap: 10px; background: var(--element-bg); border: 2px solid var(--line); padding: 6px 6px 6px 20px; border-radius: 99px; transition: 0.3s; align-items: center; }
 .compose input { flex: 1; border: 0; outline: 0; background: transparent; font-size: 15px; }
 
-.send-btn-direct { 
-  background: linear-gradient(135deg, #e8a87c, #c47c48); border: none; padding: 10px 22px; border-radius: 99px; 
-  color: white; font-weight: bold; font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 8px; 
-  box-shadow: 0 4px 15px rgba(232, 168, 124, 0.4); transition: 0.2s; 
+.send-btn-direct {
+  position: relative; overflow: hidden;
+  background: linear-gradient(135deg, #e8a87c, #c47c48); border: none; padding: 10px 22px; border-radius: 99px;
+  color: white; font-weight: bold; font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 8px;
+  box-shadow: 0 4px 15px rgba(232, 168, 124, 0.4); transition: transform 0.2s, box-shadow 0.2s;
 }
-.send-btn-direct:hover { transform: scale(1.05); }
+.send-btn-direct:hover { transform: scale(1.05); box-shadow: 0 6px 20px rgba(232, 168, 124, 0.55); }
+.send-btn-direct:active { transform: scale(0.95); }
+.send-btn-direct span[aria-hidden] { transition: transform 0.25s cubic-bezier(.34,1.56,.64,1); }
+.send-btn-direct:hover span[aria-hidden] { transform: translateX(3px); }
 
 .tts-msg-btn { background: rgba(140, 114, 101, 0.15); border: none; font-size: 12px; padding: 4px 10px; margin-top: 8px; border-radius: 10px; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; font-weight: 600; color: var(--text); transition: 0.2s; }
 .tts-msg-btn:hover { background: rgba(140, 114, 101, 0.3); }
@@ -238,7 +258,10 @@ button, input { font: inherit; color: var(--text); }
 .tools-backdrop.show { opacity: 1; pointer-events: auto; }
 
 /* ===== HỘP CÔNG CỤ CỦA CÂY MẦM ===== */
-.floating-menu { position: absolute; bottom: 58px; right: 0; width: 364px; max-height: min(580px, 72vh); overflow-y: auto; overscroll-behavior: contain; background: var(--card); border: 1px solid var(--line); border-radius: 26px; padding: 14px; box-shadow: 0 24px 60px rgba(92, 67, 58, 0.25), 0 2px 6px rgba(92, 67, 58, 0.08); display: none; transform-origin: bottom right; z-index: 2; }
+.floating-menu { position: absolute; bottom: 58px; right: 0; width: 364px; max-height: min(580px, 72vh); overflow-y: auto; overscroll-behavior: contain; background: var(--card); border: 1px solid var(--line); border-radius: 26px; padding: 14px; box-shadow: 0 24px 60px rgba(92, 67, 58, 0.25), 0 2px 6px rgba(92, 67, 58, 0.08); display: none; transform-origin: bottom right; z-index: 2; scrollbar-width: thin; scrollbar-color: var(--line) transparent; }
+.floating-menu::-webkit-scrollbar { width: 7px; }
+.floating-menu::-webkit-scrollbar-track { background: transparent; }
+.floating-menu::-webkit-scrollbar-thumb { background: var(--line); border-radius: 99px; }
 .floating-menu.show { display: block; animation: tmIn 0.34s cubic-bezier(.34,1.4,.64,1) backwards; }
 .floating-menu.closing { animation: tmOut 0.16s ease-in both; }
 @keyframes tmIn { from { opacity: 0; transform: translateY(12px) scale(0.9); } to { opacity: 1; transform: none; } }
@@ -560,6 +583,11 @@ button:focus-visible, .opt:focus-visible, .floating-btn:focus-visible, .floating
 @media (max-width: 640px) { .mic-lang { height: 36px; min-width: 36px; font-size: 11px; padding: 0 6px; } }
 @keyframes micPulse { 0% { box-shadow: 0 0 0 0 rgba(255,107,107,0.55); } 70% { box-shadow: 0 0 0 12px rgba(255,107,107,0); } 100% { box-shadow: 0 0 0 0 rgba(255,107,107,0); } }
 @media (max-width: 640px) { .mic-btn { width: 36px; height: 36px; font-size: 16px; } }
+.toast-wrap { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; gap: 8px; align-items: center; pointer-events: none; }
+.toast { background: var(--card); color: var(--text); border: 1px solid var(--line); box-shadow: 0 10px 30px rgba(0,0,0,0.18); padding: 12px 20px; border-radius: 14px; font-size: 13.5px; font-weight: 600; max-width: 86vw; text-align: center; animation: toastIn 0.35s cubic-bezier(.34,1.56,.64,1), toastOut 0.3s ease 2.7s forwards; }
+@keyframes toastIn { from { opacity: 0; transform: translateY(14px) scale(0.9); } to { opacity: 1; transform: none; } }
+@keyframes toastOut { to { opacity: 0; transform: translateY(8px) scale(0.95); } }
+@media (prefers-reduced-motion: reduce) { .toast { animation: toastOut 0.3s ease 2.7s forwards; } }
 </style>
 </head>
 <body>
@@ -688,6 +716,22 @@ function readJSON(key) {
 function writeJSON(key, val) {
   try { localStorage.setItem(key, JSON.stringify(val)); } catch (e) {}
 }
+function showToast(msg) {
+  try {
+    let wrap = document.getElementById('toastWrap');
+    if (!wrap) {
+      wrap = document.createElement('div');
+      wrap.id = 'toastWrap';
+      wrap.className = 'toast-wrap';
+      document.body.appendChild(wrap);
+    }
+    const t = document.createElement('div');
+    t.className = 'toast';
+    t.textContent = msg;
+    wrap.appendChild(t);
+    setTimeout(() => { t.remove(); }, 3100);
+  } catch (e) {}
+}
 
 /* Ghi nhận lượt tâm sự ẩn danh: chủ đề → cảm xúc → nguyên nhân → kết quả (không lưu nội dung gõ tay) */
 function logSession(field, value) {
@@ -805,6 +849,8 @@ function initStreak() {
     }
     localStorage.setItem('lastActiveDate', today);
     localStorage.setItem('healStreak', streak);
+    var badgeEl = document.getElementById('streakBadge');
+    badgeEl.classList.remove('pop'); void badgeEl.offsetWidth; badgeEl.classList.add('pop'); // bật lại hiệu ứng "nảy" mỗi khi chuỗi tăng
   }
   document.getElementById('streakBadge').innerText = `🔥 Chuỗi: ${streak} ngày chữa lành`;
   // Mốc chuỗi 3 / 7 / 14 / 30 ngày: chúc mừng 1 lần mỗi ngày đạt mốc
@@ -952,7 +998,9 @@ function showSurveySummary(card, e, logs) {
 function toggleTheme() {
   document.body.classList.toggle('dark-mode');
   const isDark = document.body.classList.contains('dark-mode');
-  document.getElementById('theme-btn').innerText = isDark ? '☀️ Sáng' : '🌙 Tối';
+  const btn = document.getElementById('theme-btn');
+  btn.innerText = isDark ? '☀️ Sáng' : '🌙 Tối';
+  btn.classList.remove('theme-spin'); void btn.offsetWidth; btn.classList.add('theme-spin'); // xoay nhẹ icon khi đổi theme
   localStorage.setItem('theme', isDark ? 'dark' : 'light');
 }
 
@@ -1959,7 +2007,7 @@ function toggleWhiteNoiseLarge(btn) {
       whiteNoiseAudio = { source: whiteNoise, ctx: audioCtx };
       btn.innerText = "🔇 Tắt tiếng ồn";
       btn.style.background = "#c47c48";
-    } catch(e) { alert("Trình duyệt không hỗ trợ phát âm thanh trực tiếp."); }
+    } catch(e) { showToast("Trình duyệt không hỗ trợ phát âm thanh trực tiếp."); }
   } else {
     whiteNoiseAudio.source.stop();
     whiteNoiseAudio.ctx.close();
@@ -2146,7 +2194,7 @@ const scratchResults = [
 
 function exportCSV() {
   const logs = readJSON('sessionLogs');
-  if (!logs.length) { alert('Chưa có dữ liệu để xuất.'); return; }
+  if (!logs.length) { showToast('Chưa có dữ liệu để xuất.'); return; }
   const label = (k, list) => { const f = list.find(x => x[0] === k || x.id === k); return f ? (f[1] || f.title) : k; };
   const rows = [['Thời gian', 'Chủ đề', 'Cảm xúc', 'Nguyên nhân', 'Kết quả', 'Tâm trạng trước (1-5)', 'Tâm trạng sau (1-5)']];
   logs.forEach(l => {
@@ -2720,6 +2768,418 @@ window.addEventListener('offline', () => msg('Mất mạng rồi, nhưng cậu v
 
 input.addEventListener('keydown', e => { if(e.key === 'Enter') sendText() });
 input.addEventListener('input', () => { if (micListening) stopMic(true); }); // gõ phím khi đang nói thì tắt mic
+</script>
+
+<!-- ===== BẢN VÁ: hết lag + khảo sát 9 bước ===== -->
+<style>
+/* ===================== SỬA LAG ===================== */
+html, body, .chat { scroll-behavior: auto !important; }
+button, .opt, .tm-tile, .sv-chip, .sv-opt, .sv-face, .sv-star { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+
+/* Nền (2 quầng sáng) + đổi nền theo nhánh: GIỮ NGUYÊN như cũ. Chỉ báo trước cho trình duyệt
+   "lớp này sẽ chuyển động" để nó vẽ sẵn trên GPU → nhìn y hệt nhưng nhẹ hơn. */
+body::before, body::after { will-change: transform; }
+
+/* Chỉ bỏ làm mờ phía sau lớp nền tối khi mở hộp công cụ (rất nặng, gần như không ai nhìn thấy) */
+.tools-backdrop { -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
+
+/* Ô lựa chọn: chỉ chuyển động transform + shadow, bỏ filter, bỏ will-change */
+.opt { transition: transform .18s ease, box-shadow .18s ease !important; will-change: auto !important; }
+.opt:disabled:not(.chosen) { filter: none !important; transition: opacity .2s ease !important; }
+.opt.chosen { animation-duration: .3s !important; }
+.tm-tile { transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease !important; }
+
+/* Cuộn mượt hơn, không kéo theo cả trang */
+.chat { overscroll-behavior: contain; }
+
+/* Trên cảm ứng không có hover → bỏ hiệu ứng "nhấc lên" dính tay gây giật */
+@media (hover: none) {
+  .opt:hover, .tm-tile:hover, .sv-chip:hover, .sv-opt:hover, .sv-face:hover { transform: none !important; box-shadow: none; }
+}
+
+/* ===================== KHẢO SÁT PRO MAX ===================== */
+.w-survey { max-width: min(94%, 660px); }
+.sv-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.sv-seg { display: flex; gap: 4px; margin-bottom: 14px; }
+.sv-seg i { flex: 1; height: 6px; border-radius: 99px; background: var(--line); transition: background .3s; }
+.sv-seg i.on { background: linear-gradient(90deg, #e8a87c, #c47c48); }
+.sv-seg i.cur { background: #e8a87c; }
+.sv-body { animation: none; }
+.sv-body.fwd { animation: svFwd .28s ease; }
+.sv-body.bk { animation: svBk .28s ease; }
+@keyframes svFwd { from { opacity: 0; transform: translateX(22px); } to { opacity: 1; transform: none; } }
+@keyframes svBk { from { opacity: 0; transform: translateX(-22px); } to { opacity: 1; transform: none; } }
+.sv-q { font-size: 16.5px; margin: 0 0 4px; }
+.sv-shake { animation: svShake .4s; }
+
+/* thẻ lựa chọn đơn */
+.sv-opts { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 8px 0 12px; }
+.sv-opt { display: flex; align-items: center; gap: 10px; text-align: left; font: inherit; color: var(--text); cursor: pointer; padding: 12px; border-radius: 16px; border: 1.5px solid var(--line); background: var(--card);
+  transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease, background .18s ease; }
+.sv-opt:hover { transform: translateY(-2px); border-color: #e8a87c; }
+.sv-opt .e { font-size: 24px; line-height: 1; flex-shrink: 0; }
+.sv-opt b { display: block; font-size: 13.5px; }
+.sv-opt small { display: block; font-size: 11.5px; color: var(--muted); margin-top: 2px; line-height: 1.35; }
+.sv-opt[aria-pressed="true"] { background: var(--btn-green); border-color: #8fb596; box-shadow: 0 0 0 3px rgba(143,181,150,.3); }
+.sv-chips { margin-bottom: 8px; }
+
+/* thanh trượt căng thẳng */
+.sv-slider { --c: hsl(70 60% 52%); text-align: center; margin: 10px 0 6px; }
+.sv-sl-face { font-size: 54px; line-height: 1; }
+.sv-sl-val { font-size: 26px; font-weight: 700; color: var(--c); margin-top: 4px; }
+.sv-sl-lbl { font-size: 13.5px; font-weight: 700; color: var(--muted); margin: 2px 0 12px; }
+input.sv-range { -webkit-appearance: none; appearance: none; width: 100%; height: 12px; border-radius: 99px; outline: none; cursor: pointer;
+  background: linear-gradient(90deg, #b5ceb8, #f2e5b9 50%, #eac0b0 75%, #e8908a); }
+input.sv-range::-webkit-slider-thumb { -webkit-appearance: none; width: 30px; height: 30px; border-radius: 50%; background: #fff; border: 4px solid var(--c); box-shadow: 0 3px 10px rgba(0,0,0,.22); }
+input.sv-range::-moz-range-thumb { width: 22px; height: 22px; border-radius: 50%; background: #fff; border: 4px solid var(--c); box-shadow: 0 3px 10px rgba(0,0,0,.22); }
+.sv-sl-ends { display: flex; justify-content: space-between; font-size: 11.5px; color: var(--muted); margin-top: 8px; }
+
+/* sao đánh giá */
+.sv-stars { display: flex; justify-content: center; gap: 6px; margin: 14px 0 4px; }
+.sv-star { border: 0; background: none; font-size: 38px; line-height: 1; color: var(--line); cursor: pointer; padding: 2px; transition: transform .18s ease, color .18s ease; }
+.sv-star.on { color: #f6c344; transform: scale(1.08); }
+.sv-star-lbl { text-align: center; font-size: 13px; font-weight: 700; color: var(--muted); min-height: 18px; }
+
+/* điều hướng */
+.sv-nav { display: flex; gap: 8px; align-items: center; margin-top: 12px; }
+.sv-nav .sp { flex: 1; }
+.sv-skip { border: 0; background: none; color: var(--muted); font: inherit; font-size: 12.5px; font-weight: 700; cursor: pointer; padding: 8px 10px; border-radius: 12px; }
+.sv-skip:hover { background: var(--card); color: var(--text); }
+
+/* kết quả */
+.sv-result { display: flex; align-items: center; gap: 16px; background: var(--btn-green); border-radius: 22px; padding: 14px 16px; margin: 6px 0 10px; }
+.sv-result b.t { display: block; font-size: 15px; }
+.sv-result small.t { display: block; font-size: 12px; opacity: .8; margin-top: 3px; line-height: 1.4; }
+.sv-gauge { position: relative; width: 104px; height: 104px; flex-shrink: 0; --gc: #4caf7d; }
+.sv-gauge svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.sv-gauge .bg { stroke: rgba(255,255,255,.55); }
+.sv-gauge .fg { stroke: var(--gc); stroke-linecap: round; transition: stroke-dashoffset 1.1s cubic-bezier(.22,1,.36,1); }
+.sv-gauge-n { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; }
+.sv-gauge-n b { font-size: 28px; line-height: 1; }
+.sv-gauge-n small { font-size: 11px; opacity: .7; }
+.sv-dims { margin: 10px 0; }
+.sv-dim { display: flex; align-items: center; gap: 8px; font-size: 12.5px; margin: 6px 0; }
+.sv-dim .l { width: 36%; }
+.sv-dim .tr { flex: 1; height: 9px; border-radius: 99px; background: var(--card); border: 1px solid var(--line); overflow: hidden; }
+.sv-dim .f { display: block; height: 100%; width: 100%; transform-origin: left; transform: scaleX(0); background: linear-gradient(90deg, #e8a87c, #c47c48); transition: transform .9s cubic-bezier(.22,1,.36,1); }
+.sv-dim .f.go { transform: scaleX(var(--p)); }
+.sv-tips { display: flex; flex-direction: column; gap: 6px; margin: 10px 0; }
+.sv-tip { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 9px 12px; font-size: 13px; line-height: 1.5; }
+.sv-goal { background: var(--btn-yellow); border-radius: 16px; padding: 10px 14px; font-size: 13.5px; font-weight: 600; margin: 8px 0; line-height: 1.45; }
+@media (max-width: 480px) {
+  .sv-opts { grid-template-columns: 1fr; }
+  .sv-result { flex-direction: column; text-align: center; }
+  .sv-dim .l { width: 42%; }
+}
+@media (prefers-reduced-motion: reduce) { .sv-gauge .fg, .sv-dim .f { transition: none; } }
+</style>
+
+<script>
+/* ============================================================
+   KHẢO SÁT HÀNH TRÌNH 9 BƯỚC (ghi đè renderSurvey + showSurveySummary).
+   Chỉ lưu lựa chọn trên máy, không lưu chữ gõ tay. Gửi server vẫn đúng 3 trường cũ.
+============================================================ */
+const SV_SLEEP = [
+  ['good', '😴', 'Ngủ ngon', 'Đủ giấc, sáng dậy khỏe'],
+  ['ok', '🙂', 'Tạm ổn', 'Thỉnh thoảng hơi thiếu ngủ'],
+  ['late', '🌙', 'Hay thức khuya', 'Ngủ muộn vì học hoặc lướt máy'],
+  ['bad', '😵‍💫', 'Khó ngủ', 'Trằn trọc, hay tỉnh giấc']
+];
+const SV_COPING = [
+  ['adult', '👩‍🏫', 'Kể với bố mẹ / thầy cô'], ['friend', '🧑‍🤝‍🧑', 'Tâm sự với bạn'],
+  ['plan', '🗓️', 'Lên kế hoạch học'], ['rest', '🛌', 'Nghỉ ngơi'],
+  ['sport', '🏃', 'Vận động'], ['music', '🎧', 'Nghe nhạc'],
+  ['write', '✍️', 'Viết ra giấy'], ['breath', '🌬️', 'Hít thở sâu']
+];
+const SV_TOOLS = [
+  ['breathe', '🧘', 'Trạm thở'], ['dice', '🎲', 'Xúc xắc cảm xúc'], ['cards', '🎴', 'Bốc thẻ số phận'],
+  ['scratch', '🎟️', 'Cào mở kết quả'], ['jar', '🫙', 'Hũ biết ơn'], ['story', '📖', 'Câu chuyện'],
+  ['chat', '💬', 'Trò chuyện với Cây Mầm']
+];
+const SV_GOALS = [
+  ['plan', '🗓️', 'Lập kế hoạch học nhỏ', 'Chia việc thành từng bước ngắn'],
+  ['sleep', '😴', 'Ngủ sớm hơn', 'Đặt giờ tắt máy mỗi tối'],
+  ['talk', '🗣️', 'Nói chuyện với người tin tưởng', 'Bố mẹ, thầy cô hoặc bạn thân'],
+  ['breathe', '🧘', 'Thở 3 phút mỗi ngày', 'Dùng Trạm thở lúc căng thẳng'],
+  ['ask', '🙋', 'Hỏi thầy cô bài chưa hiểu', 'Bắt đầu từ một câu hỏi nhỏ'],
+  ['joy', '🎈', 'Dành thời gian cho sở thích', 'Mỗi ngày 15 phút cho riêng mình']
+];
+const SV_SUPPORT_FACES = ['😔', '🙁', '😐', '🙂', '🥰'];
+const SV_SUPPORT_LBL = ['Chưa có ai', 'Rất ít', 'Đôi khi', 'Khá nhiều', 'Rất nhiều'];
+const SV_STARS_LBL = ['Chưa giúp mấy', 'Hơi giúp', 'Cũng giúp', 'Giúp nhiều', 'Giúp rất nhiều'];
+const SV_STRESS_FACE = ['😌', '😌', '🙂', '🙂', '😐', '😐', '😕', '😟', '😰', '😣', '😫'];
+const SV_STRESS_LBL = ['Rất nhẹ nhàng', 'Nhẹ nhàng', 'Khá thoải mái', 'Hơi bận lòng', 'Bận lòng', 'Căng vừa phải', 'Khá căng', 'Căng thẳng', 'Rất căng', 'Quá tải', 'Cực kỳ quá tải'];
+const svColor = v => `hsl(${Math.round(130 - v * 13)} 60% 52%)`;
+const svDefaults = () => ({ solved: [], none: false, mood: 0, stress: null, sleep: '', support: 0, coping: [], tools: [], goal: '', rating: 0 });
+
+function svSteps() {
+  return [
+    { id: 'solved', k: 'topics', t: 'Điều gì đã nhẹ đi với cậu?', h: 'Chọn những vấn đề cậu thấy đã đỡ hơn hoặc được giải quyết rồi. Chọn nhiều cũng được.' },
+    { id: 'mood', k: 'faces', req: true, faces: MOOD_FACES, labels: SURVEY_MOOD_LABELS, t: 'So với lúc mới bắt đầu, hôm nay cậu thấy thế nào?', h: 'Chọn khuôn mặt giống tâm trạng của cậu nhất nhé.' },
+    { id: 'stress', k: 'slider', req: true, t: 'Bây giờ cậu thấy căng thẳng đến mức nào?', h: 'Kéo thanh trượt: 0 là rất nhẹ nhàng, 10 là quá tải.' },
+    { id: 'sleep', k: 'cards', opts: SV_SLEEP, t: 'Giấc ngủ của cậu dạo này ra sao?', h: 'Ngủ đủ giúp đầu óc nhẹ đi rất nhiều.' },
+    { id: 'support', k: 'faces', faces: SV_SUPPORT_FACES, labels: SV_SUPPORT_LBL, t: 'Cậu có người để chia sẻ khi nặng lòng không?', h: 'Bố mẹ, thầy cô, bạn bè hay bất kỳ ai cậu tin tưởng.' },
+    { id: 'coping', k: 'multi', opts: SV_COPING, t: 'Cậu đã thử cách nào để gỡ rối?', h: 'Chọn những việc cậu đã làm gần đây, chọn nhiều cũng được.' },
+    { id: 'tools', k: 'multi', opts: SV_TOOLS, t: 'Công cụ nào của Cây Mầm giúp cậu nhất?', h: 'Để tớ biết nên giữ lại điều gì cho cậu.' },
+    { id: 'goal', k: 'cards', opts: SV_GOALS, t: 'Tuần này cậu muốn thử việc nhỏ nào?', h: 'Chọn một việc vừa sức thôi, nhỏ cũng là tiến bộ.' },
+    { id: 'rating', k: 'stars', t: 'Góc nhỏ tâm sự giúp cậu được bao nhiêu?', h: 'Một đánh giá nhanh để tớ tốt hơn mỗi ngày.' }
+  ];
+}
+
+function svBodyHTML(s, a) {
+  if (s.k === 'topics') {
+    return `<div class="sv-chips">${Object.keys(treeData).map(k =>
+      `<button type="button" class="sv-chip" data-k="${k}" aria-pressed="${a.solved.includes(k)}">${treeData[k].icon} ${escapeHTML(surveyTopicName(k))}</button>`).join('')}` +
+      `<button type="button" class="sv-chip" data-k="none" aria-pressed="${a.none}">🌫️ Chưa có, tớ vẫn đang cố gắng</button></div>`;
+  }
+  if (s.k === 'multi') {
+    return `<div class="sv-chips">${s.opts.map(o =>
+      `<button type="button" class="sv-chip" data-k="${o[0]}" aria-pressed="${a[s.id].includes(o[0])}">${o[1]} ${escapeHTML(o[2])}</button>`).join('')}</div>`;
+  }
+  if (s.k === 'cards') {
+    return `<div class="sv-opts">${s.opts.map(o =>
+      `<button type="button" class="sv-opt" data-k="${o[0]}" aria-pressed="${a[s.id] === o[0]}"><span class="e">${o[1]}</span><span><b>${escapeHTML(o[2])}</b>${o[3] ? `<small>${escapeHTML(o[3])}</small>` : ''}</span></button>`).join('')}</div>`;
+  }
+  if (s.k === 'faces') {
+    return `<div class="sv-faces" role="radiogroup" aria-label="${escapeHTML(s.t)}">${s.faces.map((f, i) =>
+      `<button type="button" class="sv-face ${a[s.id] === i + 1 ? 'on' : ''}" role="radio" aria-checked="${a[s.id] === i + 1}" data-v="${i + 1}"><span>${f}</span><small>${escapeHTML(s.labels[i])}</small></button>`).join('')}</div>`;
+  }
+  if (s.k === 'slider') {
+    const has = a.stress !== null, v = has ? a.stress : 5;
+    return `<div class="sv-slider" style="--c:${svColor(v)}">
+      <div class="sv-sl-face">${has ? SV_STRESS_FACE[v] : '🤔'}</div>
+      <div class="sv-sl-val">${has ? v + '/10' : '–/10'}</div>
+      <div class="sv-sl-lbl">${has ? SV_STRESS_LBL[v] : 'Kéo thanh trượt để chọn'}</div>
+      <input type="range" class="sv-range" min="0" max="10" step="1" value="${v}" aria-label="Mức căng thẳng từ 0 đến 10">
+      <div class="sv-sl-ends"><span>0 · Rất nhẹ</span><span>10 · Quá tải</span></div></div>`;
+  }
+  if (s.k === 'stars') {
+    return `<div class="sv-stars" role="radiogroup" aria-label="Đánh giá từ 1 đến 5 sao">${[1, 2, 3, 4, 5].map(i =>
+      `<button type="button" class="sv-star ${a.rating >= i ? 'on' : ''}" data-v="${i}" role="radio" aria-checked="${a.rating === i}" aria-label="${i} sao">★</button>`).join('')}</div>
+      <div class="sv-star-lbl">${a.rating ? SV_STARS_LBL[a.rating - 1] : ''}</div>`;
+  }
+  return '';
+}
+
+/* Vẽ một câu hỏi. step tính từ 1. */
+function renderSurvey(card, n, step, dir) {
+  const sv = card._sv || (card._sv = { n, i: 0, a: svDefaults() });
+  if (!card._svBound) svBind(card);
+  const steps = svSteps(), total = steps.length;
+  sv.i = Math.max(0, Math.min(total - 1, (step || 1) - 1));
+  clearTimeout(sv.t);
+  const s = steps[sv.i], a = sv.a, last = sv.i === total - 1;
+  const seg = steps.map((_, i) => `<i class="${i < sv.i ? 'on' : (i === sv.i ? 'on cur' : '')}"></i>`).join('');
+  card.innerHTML = `
+    <div class="sv-meta"><span class="sv-badge">🔥 Ngày ${sv.n}</span><span class="sv-step">Câu ${sv.i + 1}/${total}</span></div>
+    <div class="sv-seg" role="progressbar" aria-valuemin="1" aria-valuemax="${total}" aria-valuenow="${sv.i + 1}">${seg}</div>
+    <div class="sv-body ${dir === 'back' ? 'bk' : 'fwd'}">
+      <h4 class="sv-q">${s.t}</h4><p class="w-hint">${s.h}</p>
+      ${svBodyHTML(s, a)}
+      <p class="sv-err" aria-live="polite"></p>
+      <div class="sv-nav">
+        ${sv.i > 0 ? '<button type="button" class="small-btn ghost" data-act="back">← Quay lại</button>' : ''}
+        <span class="sp"></span>
+        ${!s.req && !last ? '<button type="button" class="sv-skip" data-act="skip">Bỏ qua</button>' : ''}
+        <button type="button" class="small-btn" data-act="next">${last ? 'Xem kết quả ✨' : 'Tiếp tục →'}</button>
+      </div>
+    </div>`;
+  requestAnimationFrame(() => card.scrollIntoView({ block: 'nearest' }));
+}
+
+/* Một bộ lắng nghe cho cả thẻ (event delegation): bấm chọn chỉ đổi class tại chỗ, không vẽ lại → mượt */
+function svBind(card) {
+  card._svBound = true;
+  const clearErr = () => { const er = card.querySelector('.sv-err'); if (er) er.textContent = ''; };
+  card.addEventListener('click', (e) => {
+    const sv = card._sv; if (!sv || sv.done) return;
+    const steps = svSteps(), s = steps[sv.i], a = sv.a;
+    const act = e.target.closest('[data-act]');
+    if (act) {
+      const t = act.dataset.act;
+      if (t === 'back') renderSurvey(card, sv.n, sv.i, 'back');
+      else if (t === 'next') svNext(card);
+      else if (t === 'skip') renderSurvey(card, sv.n, sv.i + 2, 'fwd');
+      return;
+    }
+    const chip = e.target.closest('.sv-chip');
+    if (chip) {
+      const k = chip.dataset.k;
+      if (s.k === 'topics') {
+        if (k === 'none') { a.none = !a.none; if (a.none) a.solved = []; }
+        else { a.none = false; a.solved = a.solved.includes(k) ? a.solved.filter(x => x !== k) : [...a.solved, k]; }
+        card.querySelectorAll('.sv-chip').forEach(c => c.setAttribute('aria-pressed', c.dataset.k === 'none' ? a.none : a.solved.includes(c.dataset.k)));
+      } else if (s.k === 'multi') {
+        a[s.id] = a[s.id].includes(k) ? a[s.id].filter(x => x !== k) : [...a[s.id], k];
+        chip.setAttribute('aria-pressed', a[s.id].includes(k));
+      }
+      return;
+    }
+    const opt = e.target.closest('.sv-opt');
+    if (opt && s.k === 'cards') {
+      a[s.id] = opt.dataset.k;
+      card.querySelectorAll('.sv-opt').forEach(o => o.setAttribute('aria-pressed', o === opt));
+      svAuto(card);
+      return;
+    }
+    const face = e.target.closest('.sv-face');
+    if (face && s.k === 'faces') {
+      a[s.id] = +face.dataset.v;
+      card.querySelectorAll('.sv-face').forEach(f => { const on = f === face; f.classList.toggle('on', on); f.setAttribute('aria-checked', on); });
+      clearErr(); svAuto(card);
+      return;
+    }
+    const star = e.target.closest('.sv-star');
+    if (star && s.k === 'stars') {
+      a.rating = +star.dataset.v;
+      card.querySelectorAll('.sv-star').forEach(b => { const v = +b.dataset.v; b.classList.toggle('on', v <= a.rating); b.setAttribute('aria-checked', v === a.rating); });
+      card.querySelector('.sv-star-lbl').textContent = SV_STARS_LBL[a.rating - 1];
+    }
+  });
+  const sliderSet = (el) => {
+    const sv = card._sv; if (!sv || sv.done) return;
+    const v = +el.value; sv.a.stress = v;
+    const box = el.closest('.sv-slider');
+    box.style.setProperty('--c', svColor(v));
+    box.querySelector('.sv-sl-face').textContent = SV_STRESS_FACE[v];
+    box.querySelector('.sv-sl-val').textContent = v + '/10';
+    box.querySelector('.sv-sl-lbl').textContent = SV_STRESS_LBL[v];
+    clearErr();
+  };
+  card.addEventListener('input', (e) => { if (e.target.classList.contains('sv-range')) sliderSet(e.target); });
+  card.addEventListener('pointerup', (e) => { if (e.target.classList.contains('sv-range')) sliderSet(e.target); });
+}
+
+/* Chọn xong 1 đáp án thì tự sang câu tiếp sau 0,3 giây (trừ câu cuối) */
+function svAuto(card) {
+  const sv = card._sv;
+  clearTimeout(sv.t);
+  if (sv.i >= svSteps().length - 1) return;
+  sv.t = setTimeout(() => svNext(card), 300);
+}
+function svNext(card) {
+  const sv = card._sv, steps = svSteps(), s = steps[sv.i], a = sv.a;
+  clearTimeout(sv.t);
+  const ok = s.id === 'mood' ? a.mood > 0 : (s.id === 'stress' ? a.stress !== null : true);
+  if (!ok) {
+    const box = card.querySelector('.sv-faces, .sv-slider');
+    if (box) { box.classList.remove('sv-shake'); void box.offsetWidth; box.classList.add('sv-shake'); }
+    card.querySelector('.sv-err').textContent = s.id === 'mood' ? 'Cậu chọn giúp tớ một khuôn mặt nhé 🙂' : 'Cậu kéo thanh trượt giúp tớ nhé 🙂';
+    return;
+  }
+  if (sv.i >= steps.length - 1) svFinish(card);
+  else renderSurvey(card, sv.n, sv.i + 2, 'fwd');
+}
+
+/* Điểm "độ nhẹ lòng" 0–100: chỉ để cậu tự nhìn lại, KHÔNG phải đánh giá hay chẩn đoán */
+function svScore(e) {
+  const m = e.mood ? (e.mood - 1) / 4 : .5;
+  const calm = e.stress == null ? .5 : (10 - e.stress) / 10;
+  const slp = ({ good: 1, ok: .7, late: .35, bad: .1 })[e.sleep]; const sleep = slp == null ? .5 : slp;
+  const sup = e.support ? (e.support - 1) / 4 : .5;
+  const cop = Math.min(3, (e.coping || []).length) / 3;
+  return { score: Math.round(m * 35 + calm * 25 + sleep * 15 + sup * 15 + cop * 10), dims: { m, calm, sleep, sup, cop } };
+}
+
+function svFinish(card) {
+  const sv = card._sv, a = sv.a;
+  const entry = { ts: Date.now(), streak: sv.n, solved: a.solved.slice(), mood: a.mood, stress: a.stress, sleep: a.sleep, support: a.support,
+    coping: a.coping.slice(), tools: a.tools.slice(), goal: a.goal, rating: a.rating };
+  entry.score = svScore(entry).score;
+  const logs = readJSON('surveyLogs');
+  logs.push(entry);
+  if (logs.length > 200) logs.splice(0, logs.length - 200);
+  writeJSON('surveyLogs', logs);
+  sendStatsEvent({ type: 'survey', streak: entry.streak, solved: entry.solved, mood: entry.mood });
+  sv.done = true;
+  showSurveySummary(card, entry, logs);
+}
+
+function showSurveySummary(card, e, logs) {
+  const names = e.solved.filter(k => treeData[k]);
+  const prev = logs.length > 1 ? logs[logs.length - 2] : null;
+  const sess = readJSON('sessionLogs').filter(l => l.problem);
+  const betterCnt = sess.filter(l => l.outcome === 'better').length;
+  const sc = svScore(e), score = sc.score;
+  const gc = score >= 70 ? '#4caf7d' : (score >= 45 ? '#e0a93b' : '#e57b6e');
+  const title = score >= 75 ? 'Cậu đang rất ổn 🌻' : (score >= 55 ? 'Cậu đang khá ổn 🌿' : (score >= 35 ? 'Cậu cần chăm sóc bản thân thêm 🌱' : 'Cậu đang nặng lòng, mình cùng tìm người đồng hành nhé 💖'));
+  const C = 2 * Math.PI * 52;
+  const low = score < 45 || (e.support && e.support <= 2) || (e.stress != null && e.stress >= 9);
+
+  const dims = [['😊 Tâm trạng', sc.dims.m], ['🧘 Sự bình tĩnh', sc.dims.calm], ['😴 Giấc ngủ', sc.dims.sleep], ['🤝 Chỗ dựa', sc.dims.sup], ['🌱 Cách gỡ rối', sc.dims.cop]]
+    .map(([l, v]) => `<div class="sv-dim"><span class="l">${l}</span><span class="tr"><span class="f" style="--p:${Math.max(.04, v).toFixed(2)}"></span></span></div>`).join('');
+
+  let compare = '';
+  if (prev) {
+    const dm = e.mood - prev.mood, ds = (e.solved || []).length - (prev.solved || []).length;
+    const sd = (prev.stress != null && e.stress != null) ? e.score - svScore(prev).score : null;
+    compare = `<div class="mood-sum"><span>So với lần trước (${surveyDate(prev.ts)})</span><b>${MOOD_FACES[prev.mood - 1]} → ${MOOD_FACES[e.mood - 1]}</b>` +
+      `<em class="${dm >= 0 ? 'up' : 'down'}">${dm > 0 ? 'Tâm trạng khá hơn' : (dm < 0 ? 'Tâm trạng thấp hơn chút' : 'Tâm trạng giữ nguyên')}</em>` +
+      (sd !== null ? `<em class="${sd >= 0 ? 'up' : 'down'}">${sd >= 0 ? '+' : ''}${sd} điểm</em>` : '') +
+      `<small>${ds > 0 ? `Có thêm ${ds} vấn đề nhẹ đi 🌱` : (ds < 0 ? 'Vài vấn đề lại thấy nặng hơn, chuyện này rất bình thường.' : 'Số vấn đề đã nhẹ đi không đổi.')}</small></div>`;
+  }
+  const timeline = logs.length > 1
+    ? `<div class="sv-tl-wrap"><div class="sv-tl-title">Hành trình tâm trạng của cậu</div><div class="sv-tl">${logs.slice(-6).map(l => `<div><span>${MOOD_FACES[l.mood - 1]}</span><small>${surveyDate(l.ts)}</small></div>`).join('')}</div></div>`
+    : '';
+
+  const tips = [];
+  if (e.stress != null && e.stress >= 7) tips.push('🧘 Căng thẳng đang khá cao: thử Trạm thở 4–7–8 khoảng 3 phút, rồi cho mắt nghỉ vài phút.');
+  if (e.sleep === 'late' || e.sleep === 'bad') tips.push('😴 Giấc ngủ đang bị ảnh hưởng: tắt màn hình trước giờ ngủ 30 phút và đi ngủ sớm hơn 15 phút mỗi tối nhé.');
+  if (e.support && e.support <= 2) tips.push('🤝 Cậu đang có ít người để chia sẻ. Thử nói với một người lớn cậu tin tưởng: chỉ cần một câu "dạo này tớ hơi nặng lòng" là đủ.');
+  if (!(e.coping || []).length) tips.push('🌱 Cậu chưa thử cách gỡ rối nào, hãy chọn một việc nhỏ trong 5 phút tới (uống nước, đi bộ, viết ra giấy).');
+  const toolNames = (e.tools || []).map(k => (SV_TOOLS.find(t => t[0] === k) || [])[2]).filter(Boolean);
+  if (toolNames.length) tips.push(`✨ Công cụ hợp với cậu: ${toolNames.slice(0, 3).join(', ')}. Cậu quay lại dùng bất cứ lúc nào nhé.`);
+  if (e.mood >= 4 && (e.stress == null || e.stress <= 4)) tips.push('🌻 Cậu đang làm rất tốt. Hãy nhớ lại điều gì đã giúp cậu để dùng lại những lần sau.');
+  if (!tips.length) tips.push('🌿 Cứ giữ nhịp nhỏ nhỏ như vậy, mỗi ngày một chút là đủ rồi.');
+
+  const goal = SV_GOALS.find(g => g[0] === e.goal);
+  const closing = score >= 70
+    ? 'Nhìn lại mới thấy cậu đã tốt hơn trước rất nhiều đó 🌻 Hãy tự khen mình một câu nhé!'
+    : (score >= 45
+      ? 'Chưa hoàn toàn nhẹ cũng không sao, thoát khỏi những điều nặng lòng là một hành trình khá dài, cậu vẫn đang đi tiếp mà 🌱'
+      : 'Hôm nay chưa nhẹ lắm cũng không sao, mình vẫn ở đây với cậu. Nếu nặng lòng quá, hãy nói với người lớn cậu tin tưởng hoặc bấm 🆘 SOS nhé 💖');
+
+  card.innerHTML = `
+    <div class="sv-meta"><span class="sv-badge">🔥 Ngày ${e.streak}</span><span class="sv-step">Hoàn thành ✓</span></div>
+    <div class="sv-seg">${'<i class="on"></i>'.repeat(svSteps().length)}</div>
+    <div class="sv-body fwd">
+      <h4 class="sv-q">🌿 Tóm tắt hành trình của cậu</h4>
+      <div class="sv-result">
+        <div class="sv-gauge" style="--gc:${gc}">
+          <svg viewBox="0 0 120 120"><circle class="bg" cx="60" cy="60" r="52" fill="none" stroke-width="10"/><circle class="fg" cx="60" cy="60" r="52" fill="none" stroke-width="10" style="stroke-dasharray:${C.toFixed(1)};stroke-dashoffset:${C.toFixed(1)}"/></svg>
+          <div class="sv-gauge-n"><b>0</b><small>/100</small></div>
+        </div>
+        <div><b class="t">${title}</b><small class="t">Điểm "độ nhẹ lòng" chỉ để cậu tự nhìn lại, không phải đánh giá hay chẩn đoán.</small></div>
+      </div>
+      <div class="stat-grid">
+        <div class="stat-box"><b>${names.length}</b><small>vấn đề đã nhẹ đi</small></div>
+        <div class="stat-box"><b>${sess.length}</b><small>lượt đã tâm sự</small></div>
+        <div class="stat-box"><b>${betterCnt}</b><small>lượt thấy nhẹ lòng hơn</small></div>
+      </div>
+      <div class="sv-dims">${dims}</div>
+      ${names.length ? `<div class="sv-tags">${names.map(k => `<span class="sv-tag">${treeData[k].icon} ${escapeHTML(surveyTopicName(k))}</span>`).join('')}</div>` : '<p class="w-hint">Chưa có vấn đề nào được đánh dấu, và vậy cũng ổn 🌿</p>'}
+      ${compare}${timeline}
+      <div class="sv-tips">${tips.slice(0, 4).map(t => `<div class="sv-tip">${escapeHTML(t)}</div>`).join('')}</div>
+      ${goal ? `<div class="sv-goal">🎯 Mục tiêu tuần này: ${escapeHTML(goal[2])} – ${escapeHTML(goal[3])}</div>` : ''}
+      ${e.rating ? `<p class="w-hint" style="margin:6px 0">⭐ Cảm ơn cậu đã chấm ${e.rating}/5 cho Góc nhỏ tâm sự.</p>` : ''}
+      <p class="w-hint" style="margin:8px 0 0">${closing}</p>
+      <div class="sv-nav" style="flex-wrap:wrap">
+        <button type="button" class="small-btn ghost" onclick="openBreatheModal()">🧘 Vào trạm thở</button>
+        ${low ? '<button type="button" class="small-btn" style="background:#ff6b6b" onclick="openSosModal()">🆘 Xem số hỗ trợ</button>' : ''}
+      </div>
+      <p class="w-hint" style="margin:10px 0 0;font-size:11.5px">🔒 Câu trả lời chỉ lưu trên máy của cậu, xóa được bất cứ lúc nào.</p>
+    </div>`;
+
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    const fg = card.querySelector('.sv-gauge .fg'); if (fg) fg.style.strokeDashoffset = (C * (1 - score / 100)).toFixed(1);
+    card.querySelectorAll('.sv-dim .f').forEach(f => f.classList.add('go'));
+    const num = card.querySelector('.sv-gauge-n b'), t0 = performance.now();
+    const tick = (t) => { const p = Math.min(1, (t - t0) / 900); num.textContent = Math.round(score * (1 - Math.pow(1 - p, 3))); if (p < 1) requestAnimationFrame(tick); };
+    requestAnimationFrame(tick);
+    card.scrollIntoView({ block: 'nearest' });
+  }));
+  triggerConfetti();
+}
 </script>
 </body>
 </html>
