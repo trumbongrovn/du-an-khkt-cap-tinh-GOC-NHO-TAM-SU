@@ -318,6 +318,55 @@ button, input { font: inherit; color: var(--text); }
 @keyframes tmSheet { from { transform: translateY(100%); } to { transform: none; } }
 @keyframes tmSheetOut { to { transform: translateY(100%); } }
 
+/* Ô khảo sát trong hộp công cụ */
+.tm-survey { grid-column: 1 / -1; background: linear-gradient(135deg, var(--element-bg), var(--card)); }
+.tm-survey .tm-go { background: var(--btn-purple); }
+.tm-tile[data-action="survey"] .tm-ico { background: var(--btn-purple); }
+.tm-tile[data-action="survey"]:hover .tm-ico { transform: rotate(-8deg) scale(1.1); }
+
+/* ===== KHẢO SÁT HÀNH TRÌNH ===== */
+.w-survey { border-style: solid; border-color: #e8a87c; background: linear-gradient(180deg, var(--element-bg), var(--card)); box-shadow: 0 10px 28px var(--accent-glow); }
+.w-survey h4 { font-size: 16.5px; margin: 0 0 4px; }
+.sv-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.sv-badge { font-size: 11.5px; font-weight: 800; padding: 3px 11px; border-radius: 99px; background: var(--btn-yellow); color: var(--text); }
+.sv-step { font-size: 12px; color: var(--muted); font-weight: 700; }
+.sv-prog { display: flex; gap: 6px; margin-bottom: 14px; }
+.sv-prog i { flex: 1; height: 5px; border-radius: 99px; background: var(--line); transition: background 0.4s; }
+.sv-prog i.on { background: linear-gradient(90deg, #e8a87c, #c47c48); }
+.sv-body { animation: svIn 0.35s cubic-bezier(.22,1.1,.36,1); }
+@keyframes svIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.sv-chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 6px 0 16px; }
+.sv-chip { border: 1.5px solid var(--line); background: var(--card); color: var(--text); font: inherit; font-size: 13px; font-weight: 600; padding: 8px 14px; border-radius: 99px; cursor: pointer; text-align: left; transition: transform 0.2s cubic-bezier(.34,1.56,.64,1), background 0.2s, border-color 0.2s, box-shadow 0.2s; }
+.sv-chip:hover { transform: translateY(-2px); border-color: #e8a87c; }
+.sv-chip[aria-pressed="true"] { background: var(--btn-green); border-color: #8fb596; box-shadow: 0 0 0 3px rgba(143, 181, 150, 0.3); transform: scale(1.03); }
+.sv-chip[aria-pressed="true"]::before { content: '✓ '; font-weight: 800; }
+.sv-faces { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin: 8px 0 6px; }
+.sv-face { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 2px 8px; border: 1.5px solid var(--line); border-radius: 18px; background: var(--card); color: var(--text); font: inherit; cursor: pointer; transition: transform 0.25s cubic-bezier(.34,1.56,.64,1), background 0.2s, border-color 0.2s, box-shadow 0.2s; }
+.sv-face span { font-size: 30px; line-height: 1; }
+.sv-face small { font-size: 10.5px; color: var(--muted); text-align: center; line-height: 1.25; }
+.sv-face:hover { transform: translateY(-3px); border-color: #e8a87c; }
+.sv-face.on { background: var(--btn-orange); border-color: #e8a87c; box-shadow: 0 0 0 3px var(--accent-glow); transform: scale(1.08); }
+.sv-face.on small { color: var(--text); font-weight: 700; }
+.sv-faces.shake { animation: svShake 0.4s; }
+@keyframes svShake { 20%, 60% { transform: translateX(-6px); } 40%, 80% { transform: translateX(6px); } }
+.sv-err { color: #c0392b; font-size: 12.5px; margin: 4px 0 0; min-height: 16px; }
+.sv-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 10px; }
+.sv-hero { display: flex; align-items: center; gap: 14px; background: var(--btn-green); border-radius: 20px; padding: 14px 16px; margin: 6px 0 10px; }
+.sv-hero .big { font-size: 46px; line-height: 1; }
+.sv-hero b { display: block; font-size: 15px; }
+.sv-hero small { font-size: 12.5px; opacity: 0.8; }
+.sv-tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
+.sv-tag { font-size: 12.5px; font-weight: 600; padding: 5px 11px; border-radius: 99px; background: var(--btn-green); }
+.sv-tl-wrap { margin: 10px 0 4px; }
+.sv-tl-title { font-size: 11.5px; font-weight: 700; color: var(--muted); margin-bottom: 4px; }
+.sv-tl { display: flex; gap: 8px; overflow-x: auto; padding: 4px 2px 6px; }
+.sv-tl div { display: flex; flex-direction: column; align-items: center; gap: 2px; min-width: 40px; }
+.sv-tl span { font-size: 24px; }
+.sv-tl small { font-size: 10.5px; color: var(--muted); }
+.sv-tl div:last-child span { transform: scale(1.2); }
+@media (max-width: 420px) { .sv-face small { font-size: 9.5px; } .sv-face span { font-size: 26px; } }
+@media (prefers-reduced-motion: reduce) { .sv-body, .sv-faces.shake { animation: none; } }
+
 /* WIDGET TRÒ CHƠI */
 .action-card { margin: 10px 0 20px 76px; padding: 20px; border: 2px dashed var(--line); border-radius: 24px; background: var(--element-bg); max-width: min(80%, 620px); animation: fadeIn 0.3s ease-in-out; }
 .dice-display { width: 70px; height: 70px; background: var(--btn-orange); border: 2px solid var(--line); border-radius: 16px; margin: 12px auto; display: flex; align-items: center; justify-content: center; font-size: 32px; box-shadow: 0 6px 15px rgba(0,0,0,0.12); }
@@ -569,7 +618,7 @@ button:focus-visible, .opt:focus-visible, .floating-btn:focus-visible, .floating
 
         <button type="button" class="tm-tile tm-feature" role="menuitem" data-action="breathe" style="--i:0">
           <span class="tm-breath" aria-hidden="true"><span></span></span>
-          <span class="tm-text"><b>Trạm thở</b><small>Thở chậm theo vòng tròn, có âm thanh trắng</small></span>
+          <span class="tm-text"><b>Trạm thở</b><small>Thở chậm theo vòng tròn, có tiếng ồn trắng</small></span>
           <span class="tm-go">Bắt đầu</span>
         </button>
 
@@ -589,6 +638,11 @@ button:focus-visible, .opt:focus-visible, .floating-btn:focus-visible, .floating
           <button type="button" class="tm-tile tm-wide" role="menuitem" data-action="analytics" style="--i:5">
             <span class="tm-ico" aria-hidden="true">📊</span>
             <span class="tm-text"><b>Thống kê tuần</b><span class="tm-spark" id="tmSpark" aria-hidden="true"></span></span>
+          </button>
+          <button type="button" class="tm-tile tm-wide tm-survey" role="menuitem" data-action="survey" style="--i:6">
+            <span class="tm-ico" aria-hidden="true">📝</span>
+            <span class="tm-text"><b>Khảo sát hành trình</b><small id="tmSurveyInfo">Nhìn lại xem cậu đã nhẹ lòng thêm chưa</small></span>
+            <span class="tm-go">Làm ngay</span>
           </button>
         </div>
 
@@ -753,6 +807,146 @@ function initStreak() {
     localStorage.setItem('healStreak', streak);
   }
   document.getElementById('streakBadge').innerText = `🔥 Chuỗi: ${streak} ngày chữa lành`;
+  // Mốc chuỗi 3 / 7 / 14 / 30 ngày: chúc mừng 1 lần mỗi ngày đạt mốc
+  if ([3, 7, 14, 30].includes(streak) && localStorage.getItem('streakCelebrated') !== streak + ':' + today) {
+    localStorage.setItem('streakCelebrated', streak + ':' + today);
+    setTimeout(() => showStreakMilestone(streak), 1500);
+  }
+}
+
+function showStreakMilestone(n) {
+  triggerConfetti();
+  const box = document.createElement('div');
+  box.className = 'action-card w-streak';
+  box.innerHTML = `
+    <h4>🔥 Chuỗi ${n} ngày chữa lành!</h4>
+    <p class="w-hint">Cậu đã ghé góc nhỏ này ${n} ngày liên tiếp rồi, giỏi lắm luôn 🌱 Mình cùng nhìn lại một chút nhé?</p>
+    <button type="button" class="small-btn" onclick="openSurvey(${n}, this)">📝 Làm khảo sát nhỏ</button>`;
+  chat.appendChild(box);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+/* 4. Khảo sát hành trình: 2 bước (vấn đề đã nhẹ đi → tâm trạng so với lúc đầu), chỉ lưu lựa chọn, không lưu chữ gõ tay */
+const SURVEY_MOOD_LABELS = ['Tệ hơn nhiều', 'Hơi tệ hơn', 'Như cũ', 'Khá hơn', 'Tốt hơn nhiều'];
+const surveyTopicName = k => treeData[k].label.replace(/^\d+\.\s*/, '');
+const surveyDate = ts => new Date(ts).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' });
+
+function triggerSurvey() {
+  const menu = document.getElementById('floatingMenu');
+  if (menu) menu.classList.remove('show');
+  const n = parseInt(localStorage.getItem('healStreak') || '1') || 1;
+  const card = document.createElement('div');
+  card.className = 'action-card w-survey';
+  chat.appendChild(card);
+  renderSurvey(card, n, 1);
+  chat.scrollTop = chat.scrollHeight;
+}
+/* Thẻ chúc mừng mốc chuỗi vẫn gọi hàm này */
+function openSurvey(n, btn) {
+  const card = btn.closest('.action-card');
+  card.classList.add('w-survey');
+  renderSurvey(card, n, 1);
+  chat.scrollTop = chat.scrollHeight;
+}
+function renderSurvey(card, n, step) {
+  const sv = card._sv || (card._sv = { n, solved: [], none: false, mood: 0 });
+  const head = `
+    <div class="sv-head"><span class="sv-badge">🔥 Ngày ${sv.n}</span><span class="sv-step">Bước ${step}/2</span></div>
+    <div class="sv-prog" role="progressbar" aria-valuemin="1" aria-valuemax="2" aria-valuenow="${step}"><i class="on"></i><i class="${step >= 2 ? 'on' : ''}"></i></div>`;
+  if (step === 1) {
+    const chips = Object.keys(treeData).map(k =>
+      `<button type="button" class="sv-chip" data-k="${k}" aria-pressed="${sv.solved.includes(k)}" onclick="svToggle(this)">${treeData[k].icon} ${escapeHTML(surveyTopicName(k))}</button>`).join('');
+    card.innerHTML = `${head}<div class="sv-body">
+      <h4>Điều gì đã nhẹ đi với cậu?</h4>
+      <p class="w-hint">Chọn những vấn đề cậu thấy đã đỡ hơn hoặc được giải quyết rồi. Chọn nhiều cũng được.</p>
+      <div class="sv-chips">${chips}<button type="button" class="sv-chip" data-k="none" aria-pressed="${sv.none}" onclick="svToggle(this)">🌫️ Chưa có, tớ vẫn đang cố gắng</button></div>
+      <div class="sv-actions"><button type="button" class="small-btn" onclick="svGo(this, 2)">Tiếp tục →</button></div></div>`;
+  } else {
+    const faces = MOOD_FACES.map((f, i) =>
+      `<button type="button" class="sv-face ${sv.mood === i + 1 ? 'on' : ''}" role="radio" aria-checked="${sv.mood === i + 1}" data-v="${i + 1}" onclick="svMood(this)"><span>${f}</span><small>${SURVEY_MOOD_LABELS[i]}</small></button>`).join('');
+    card.innerHTML = `${head}<div class="sv-body">
+      <h4>So với lúc mới bắt đầu, hôm nay cậu thấy thế nào?</h4>
+      <p class="w-hint">Chọn khuôn mặt giống tâm trạng của cậu nhất nhé.</p>
+      <div class="sv-faces" role="radiogroup" aria-label="Tâm trạng hôm nay so với lúc đầu">${faces}</div>
+      <p class="sv-err" aria-live="polite"></p>
+      <div class="sv-actions"><button type="button" class="small-btn ghost" onclick="svGo(this, 1)">← Quay lại</button><button type="button" class="small-btn" onclick="svSubmit(this)">Xem kết quả</button></div></div>`;
+  }
+}
+function svToggle(b) {
+  const card = b.closest('.w-survey'), sv = card._sv, k = b.dataset.k;
+  if (k === 'none') {
+    sv.none = !sv.none;
+    if (sv.none) sv.solved = [];
+  } else {
+    sv.none = false;
+    sv.solved = sv.solved.includes(k) ? sv.solved.filter(x => x !== k) : [...sv.solved, k];
+  }
+  card.querySelectorAll('.sv-chip').forEach(c => c.setAttribute('aria-pressed', c.dataset.k === 'none' ? sv.none : sv.solved.includes(c.dataset.k)));
+}
+function svGo(b, step) {
+  const card = b.closest('.w-survey');
+  renderSurvey(card, card._sv.n, step);
+}
+function svMood(b) {
+  const card = b.closest('.w-survey');
+  card._sv.mood = parseInt(b.dataset.v);
+  card.querySelectorAll('.sv-face').forEach(f => { const on = f === b; f.classList.toggle('on', on); f.setAttribute('aria-checked', on); });
+  card.querySelector('.sv-err').textContent = '';
+}
+function svSubmit(b) {
+  const card = b.closest('.w-survey'), sv = card._sv;
+  if (!sv.mood) {
+    const faces = card.querySelector('.sv-faces');
+    faces.classList.remove('shake'); void faces.offsetWidth; faces.classList.add('shake');
+    card.querySelector('.sv-err').textContent = 'Cậu chọn giúp tớ một khuôn mặt nhé 🙂';
+    return;
+  }
+  const entry = { ts: Date.now(), streak: sv.n, solved: sv.solved.slice(), mood: sv.mood };
+  const logs = readJSON('surveyLogs');
+  logs.push(entry);
+  writeJSON('surveyLogs', logs);
+  sendStatsEvent({ type: 'survey', streak: entry.streak, solved: entry.solved, mood: entry.mood });
+  showSurveySummary(card, entry, logs);
+}
+
+/* 5. Tóm tắt khảo sát: giúp tự nhìn lại bản thân, so với lần khảo sát trước nếu có */
+function showSurveySummary(card, e, logs) {
+  const names = e.solved.filter(k => treeData[k]);
+  const prev = logs.length > 1 ? logs[logs.length - 2] : null;
+  const sess = readJSON('sessionLogs').filter(l => l.problem);
+  const betterCnt = sess.filter(l => l.outcome === 'better').length;
+  let compare = '';
+  if (prev) {
+    const dm = e.mood - prev.mood, ds = e.solved.length - prev.solved.length;
+    compare = `<div class="mood-sum"><span>So với khảo sát ngày ${surveyDate(prev.ts)}</span><b>${MOOD_FACES[prev.mood - 1]} → ${MOOD_FACES[e.mood - 1]}</b>` +
+      `<em class="${dm >= 0 ? 'up' : 'down'}">${dm > 0 ? 'Tâm trạng khá hơn' : (dm < 0 ? 'Tâm trạng thấp hơn chút' : 'Tâm trạng giữ nguyên')}</em>` +
+      `<small>${ds > 0 ? `Có thêm ${ds} vấn đề nhẹ đi 🌱` : (ds < 0 ? 'Vài vấn đề lại thấy nặng hơn, chuyện này rất bình thường.' : 'Số vấn đề đã nhẹ đi không đổi.')}</small></div>`;
+  }
+  const timeline = logs.length > 1
+    ? `<div class="sv-tl-wrap"><div class="sv-tl-title">Hành trình tâm trạng của cậu</div><div class="sv-tl">${logs.slice(-6).map(l => `<div><span>${MOOD_FACES[l.mood - 1]}</span><small>${surveyDate(l.ts)}</small></div>`).join('')}</div></div>`
+    : '';
+  const closing = e.mood >= 4
+    ? 'Nhìn lại mới thấy cậu đã tốt hơn trước rất nhiều đó 🌻 Hãy tự khen mình một câu nhé!'
+    : (e.mood === 3
+      ? 'Chưa thay đổi nhiều cũng không sao, thoát khỏi những điều nặng lòng là một hành trình khá dài, cậu vẫn đang đi tiếp mà 🌱'
+      : 'Hôm nay chưa nhẹ lắm cũng không sao, mình vẫn ở đây với cậu. Nếu nặng lòng quá, cậu có thể bấm 🆘 SOS nhé 💖');
+  card.innerHTML = `
+    <div class="sv-head"><span class="sv-badge">🔥 Ngày ${e.streak}</span><span class="sv-step">Hoàn thành ✓</span></div>
+    <div class="sv-prog"><i class="on"></i><i class="on"></i></div>
+    <div class="sv-body">
+      <h4>🌿 Tóm tắt hành trình của cậu</h4>
+      <div class="sv-hero"><span class="big">${MOOD_FACES[e.mood - 1]}</span><div><b>${SURVEY_MOOD_LABELS[e.mood - 1]}</b><small>so với lúc mới bắt đầu</small></div></div>
+      <div class="stat-grid">
+        <div class="stat-box"><b>${names.length}</b><small>vấn đề đã nhẹ đi</small></div>
+        <div class="stat-box"><b>${sess.length}</b><small>lượt đã tâm sự</small></div>
+        <div class="stat-box"><b>${betterCnt}</b><small>lượt thấy nhẹ lòng hơn</small></div>
+      </div>
+      ${names.length ? `<div class="sv-tags">${names.map(k => `<span class="sv-tag">${treeData[k].icon} ${escapeHTML(surveyTopicName(k))}</span>`).join('')}</div>` : '<p class="w-hint">Chưa có vấn đề nào được đánh dấu, và vậy cũng ổn 🌿</p>'}
+      ${compare}${timeline}
+      <p class="w-hint" style="margin:10px 0 0">${closing}</p>
+    </div>`;
+  triggerConfetti();
+  chat.scrollTop = chat.scrollHeight;
 }
 
 function toggleTheme() {
@@ -1511,6 +1705,7 @@ const TOOL_ACTIONS = {
   scratch: () => triggerWidget('scratch'),
   jar: () => triggerWidget('jar'),
   analytics: () => triggerWidget('analytics'),
+  survey: () => triggerSurvey(),
   intro: () => showIntro(),
   install: () => installApp(),
   clear: () => clearMyData()
@@ -1522,6 +1717,8 @@ const toolItems = () => [...toolsMenu().querySelectorAll('[data-action]')];
 function refreshToolsMenu() {
   const jar = readJSON('gratitudeJar').length;
   document.getElementById('tmJarCount').textContent = jar ? `${jar} điều đã thả vào hũ` : 'Hũ đang trống';
+  const svDone = readJSON('surveyLogs').length, svEl = document.getElementById('tmSurveyInfo');
+  if (svEl) svEl.textContent = svDone ? `Đã làm ${svDone} lần · xem cậu tiến xa chưa` : 'Nhìn lại xem cậu đã nhẹ lòng thêm chưa';
   const logs = readJSON('sessionLogs');
   const days = [];
   for (let i = 6; i >= 0; i--) {
@@ -1656,7 +1853,7 @@ function openBreatheModal() {
       <div class="bm-cycles" id="breathCycles">${Array.from({ length: BREATH_GOAL }, () => '<i></i>').join('')}</div>
       <div class="bm-actions">
         <button type="button" class="bm-start" id="breathStart" onclick="toggleBreathing()">▶ Bắt đầu thở</button>
-        <button type="button" class="bm-sec" onclick="toggleWhiteNoiseLarge(this)">🎵 Âm thanh trắng</button>
+        <button type="button" class="bm-sec" onclick="toggleWhiteNoiseLarge(this)">🎵 Tiếng ồn trắng</button>
         <button type="button" class="bm-sec" onclick="startCameraBreathingLarge(this)">📷 Bật camera</button>
       </div>
       <div id="breathStatusLarge" class="bm-status">Chọn kiểu thở rồi bấm "Bắt đầu thở" nhé.</div>
@@ -1760,14 +1957,14 @@ function toggleWhiteNoiseLarge(btn) {
       whiteNoise.start();
 
       whiteNoiseAudio = { source: whiteNoise, ctx: audioCtx };
-      btn.innerText = "🔇 Tắt âm thanh";
+      btn.innerText = "🔇 Tắt tiếng ồn";
       btn.style.background = "#c47c48";
     } catch(e) { alert("Trình duyệt không hỗ trợ phát âm thanh trực tiếp."); }
   } else {
     whiteNoiseAudio.source.stop();
     whiteNoiseAudio.ctx.close();
     whiteNoiseAudio = null;
-    btn.innerText = "🎵 Âm thanh trắng";
+    btn.innerText = "🎵 Tiếng ồn trắng";
     btn.style.background = "#8c7265";
   }
 }
@@ -1976,7 +2173,7 @@ function clearMyData() {
   const menu = document.getElementById('floatingMenu');
   if (menu) menu.classList.remove('show');
   if (!confirm('Xóa toàn bộ thống kê cảm xúc, hũ biết ơn và chuỗi ngày trên máy này?')) return;
-  ['moodAnalytics', 'gratitudeJar', 'sessionLogs', 'healStreak', 'lastActiveDate', 'healSessionId'].forEach(k => localStorage.removeItem(k));
+  ['moodAnalytics', 'gratitudeJar', 'sessionLogs', 'surveyLogs', 'healStreak', 'lastActiveDate', 'healSessionId'].forEach(k => localStorage.removeItem(k));
   initStreak();
   restartInteractive();
   msg('Đã xóa sạch dữ liệu của cậu trên máy này rồi nhé 🔒');
