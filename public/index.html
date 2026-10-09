@@ -1461,10 +1461,8 @@ const followupOptions = () => [
 ];
 
 window.onload = () => {
-  if (localStorage.getItem('theme') === 'dark') {
-    document.body.classList.add('dark-mode');
-    document.getElementById('theme-btn').innerText = '☀️ Sáng';
-  }
+  // Luôn mở lên bằng giao diện sáng (không nhớ lựa chọn tối của lần trước)
+  try { localStorage.removeItem('theme'); } catch (e) {}
   initStreak();
   const voice = document.getElementById('autoVoiceToggle');
   voice.checked = localStorage.getItem('autoVoice') === 'on';
