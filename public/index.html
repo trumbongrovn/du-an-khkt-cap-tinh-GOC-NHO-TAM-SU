@@ -2,11 +2,12 @@
 <html lang="vi">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<meta name="supported-color-schemes" content="light">
 <title>Góc nhỏ tâm sự</title>
 <meta name="description" content="Người bạn lắng nghe dành cho học sinh: tâm sự, trạm thở, gợi ý gỡ rối áp lực học tập.">
-<meta name="theme-color" content="#f7eee3" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#2e2825" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f7eee3">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -589,6 +590,18 @@ button:focus-visible, .opt:focus-visible, .floating-btn:focus-visible, .floating
 @keyframes toastOut { to { opacity: 0; transform: translateY(8px) scale(0.95); } }
 @media (prefers-reduced-motion: reduce) { .toast { animation: toastOut 0.3s ease 2.7s forwards; } }
 </style>
+<script>
+(function(){
+  function setH(){
+    var h = (window.visualViewport && window.visualViewport.height) || window.innerHeight;
+    document.documentElement.style.setProperty('--app-h', h + 'px');
+  }
+  setH();
+  window.addEventListener('resize', setH);
+  window.addEventListener('orientationchange', function(){ setTimeout(setH, 200); });
+  if (window.visualViewport) window.visualViewport.addEventListener('resize', setH);
+})();
+</script>
 </head>
 <body>
 <div class="app"><div class="main">
@@ -2872,6 +2885,51 @@ input.sv-range::-moz-range-thumb { width: 22px; height: 22px; border-radius: 50%
   .sv-dim .l { width: 42%; }
 }
 @media (prefers-reduced-motion: reduce) { .sv-gauge .fg, .sv-dim .f { transition: none; } }
+
+/* ===================== VÁ ĐIỆN THOẠI + CHẶN TỰ ĐỘI NỀN TỐI ===================== */
+/* Chặn "Auto dark / Force dark" của trình duyệt (Chrome, Samsung, Zalo, trình quét QR...) làm mất khung & màu */
+html { color-scheme: light; color-scheme: only light; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+html:has(body.dark-mode) { color-scheme: dark; color-scheme: only dark; }
+html, body { max-width: 100%; }
+.msg, .bubble, .options, .action-card, .compose, .top, .composer { min-width: 0; }
+.bubble, .opt, .tm-text { overflow-wrap: anywhere; }
+img, video, canvas, svg { max-width: 100%; }
+
+/* Chiều cao thật của màn hình điện thoại (trừ thanh địa chỉ) – 100vh làm mất đáy trang */
+@supports (height: 100dvh) {
+  body { height: 100dvh; }
+  .breathe-modal, .sos-modal { height: 100dvh; }
+}
+@media (max-width: 640px) {
+  body { height: var(--app-h, 100dvh); min-height: 0; }
+  .app { height: var(--app-h, 100dvh); max-width: 100vw; }
+  .main { min-height: 0; }
+  .chat { min-height: 0; overflow-x: hidden; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
+  .composer { padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px)); padding-left: max(12px, env(safe-area-inset-left, 0px)); padding-right: max(12px, env(safe-area-inset-right, 0px)); }
+  .top { padding-top: calc(10px + env(safe-area-inset-top, 0px)); }
+  .compose { padding-left: 14px; min-width: 0; }
+  .compose input { min-width: 0; font-size: 16px; } /* 16px để iOS không tự phóng to khi bấm vào ô nhập */
+  .welcome h2 { font-size: 21px; }
+  .welcome { margin: 4px auto 18px; }
+  .msg { gap: 8px; margin: 14px 0; }
+  .options { gap: 10px; }
+  .opt { padding: 12px 16px; font-size: 14px; }
+  .scratch-container { width: min(260px, 100%); }
+  .breathe-modal-content { padding: 24px 18px; border-radius: 28px; max-height: 92dvh; overflow-y: auto; }
+  .breathe-circle-large { width: 120px; height: 120px; margin: 20px auto; }
+  .cam-preview-large { width: 120px; height: 120px; }
+  .intro-card { padding: 20px 16px; max-height: 92dvh; overflow-y: auto; }
+  .intro-modal { padding: 10px; }
+  .action-card { padding: 14px; }
+}
+@media (max-width: 380px) {
+  .top-actions button { padding: 5px 8px; font-size: 11px; }
+  .bubble { max-width: 88%; font-size: 14px; padding: 12px 14px; }
+  .av { width: 44px; height: 44px; }
+  .av .plant-icon { font-size: 21px; }
+  .av .plant-face { font-size: 14px; }
+  .send-btn-direct { padding: 10px 12px; font-size: 13px; }
+}
 </style>
 
 <script>
