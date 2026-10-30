@@ -226,6 +226,7 @@ button, input { font: inherit; color: var(--text); }
 }
 .send-btn-direct:hover { transform: scale(1.05); box-shadow: 0 6px 20px rgba(232, 168, 124, 0.55); }
 .send-btn-direct:active { transform: scale(0.95); }
+.send-btn-direct:disabled { opacity: 0.55; cursor: default; transform: none; box-shadow: none; }
 .send-btn-direct span[aria-hidden] { transition: transform 0.25s cubic-bezier(.34,1.56,.64,1); }
 .send-btn-direct:hover span[aria-hidden] { transform: translateX(3px); }
 
@@ -519,8 +520,13 @@ button:focus-visible, .opt:focus-visible, .floating-btn:focus-visible, .floating
 .jar.wobble { animation: jarWobble 0.7s ease 0.35s; }
 @keyframes jarWobble { 20% { transform: rotate(-4deg); } 45% { transform: rotate(3deg); } 70% { transform: rotate(-1.5deg); } }
 .jar-lid { width: 62px; height: 12px; margin: 0 auto; border-radius: 6px 6px 3px 3px; background: linear-gradient(#d9a47b, #b8805a); }
-.jar-body { position: relative; height: 104px; margin-top: 2px; border-radius: 16px 16px 26px 26px; background: linear-gradient(90deg, rgba(255,255,255,0.55), rgba(255,255,255,0.15) 40%, rgba(255,255,255,0.4)); border: 2px solid rgba(180,160,140,0.55); overflow: hidden; box-shadow: inset 0 -8px 16px rgba(232,168,124,0.18); }
-.jstar { position: absolute; font-size: 15px; line-height: 1; transform: rotate(var(--r)); text-shadow: 0 1px 1px rgba(0,0,0,0.12); }
+.jar-body { position: relative; height: 104px; margin-top: 2px; border-radius: 16px 16px 26px 26px; background: linear-gradient(90deg, rgba(255,255,255,0.55), rgba(255,255,255,0.15) 40%, rgba(255,255,255,0.4)); border: 2px solid rgba(180,160,140,0.55); overflow-x: hidden; overflow-y: auto; scrollbar-width: thin; scrollbar-color: rgba(180,160,140,0.6) transparent; box-shadow: inset 0 -8px 16px rgba(232,168,124,0.18); }
+.jar-stars { min-height: 100%; display: flex; flex-wrap: wrap; align-content: flex-end; justify-content: center; padding: 3px 4px; }
+.jstar { position: relative; flex: 0 0 auto; margin: 0 1px; font-size: 15px; line-height: 1; transform: rotate(var(--r)); text-shadow: 0 1px 1px rgba(0,0,0,0.12); background: none; border: 0; padding: 0; cursor: pointer; font-family: inherit; }
+.jstar:hover { filter: brightness(1.15); }
+.jstar.sel { font-size: 19px; z-index: 2; filter: drop-shadow(0 0 4px rgba(246,195,68,0.9)); }
+.jar-note { margin-top: 8px; padding: 8px 10px; border-radius: 12px; background: rgba(232,168,124,0.12); border: 1px dashed var(--line); font-size: 13px; line-height: 1.5; min-height: 20px; overflow-wrap: anywhere; }
+.jar-note small { color: var(--muted); display: block; }
 .jstar.drop { animation: starDrop 0.75s cubic-bezier(.5,0,.75,0) both; }
 @keyframes starDrop { 0% { transform: translateY(-120px) rotate(0deg); opacity: 0; } 30% { opacity: 1; } 85% { transform: translateY(4px) rotate(var(--r)); } 100% { transform: translateY(0) rotate(var(--r)); } }
 .jar-side { flex: 1; min-width: 0; }
@@ -639,7 +645,7 @@ button:focus-visible, .opt:focus-visible, .floating-btn:focus-visible, .floating
       <button type="button" id="micBtn" class="mic-btn" aria-label="Bấm để nói" title="Bấm để nói, bấm lần nữa để dừng">🎤</button>
       <button type="button" id="micLangBtn" class="mic-lang" aria-label="Chọn ngôn ngữ nói" title="Chọn ngôn ngữ nói (bấm để đổi)">VI</button>
     </div>
-    <button class="send-btn-direct" onclick="sendText()" aria-label="Gửi tin nhắn">
+    <button class="send-btn-direct" id="sendBtn" onclick="sendText()" aria-label="Gửi tin nhắn">
       <span aria-hidden="true">➤</span> Gửi đi
     </button>
 
@@ -717,7 +723,9 @@ button:focus-visible, .opt:focus-visible, .floating-btn:focus-visible, .floating
 
 <script>
 const chat = document.getElementById('chat'), input = document.getElementById('input');
-let state = 'problem', selectedProblem = null, selectedEmotion = null;
+/* Trạng thái luồng trò chuyện gom về một chỗ: dễ debug, reset một lần khi bấm Làm mới */
+const S = { state: 'problem', selectedProblem: null, selectedEmotion: null };
+const resetFlowState = () => { S.state = 'problem'; S.selectedProblem = null; S.selectedEmotion = null; };
 let currentSessionTs = null; // mốc thời gian của lượt tâm sự hiện tại (phục vụ thống kê hiệu quả)
 
 function escapeHTML(str) {
@@ -1540,8 +1548,14 @@ function readStoryAloud(text, langCode = 'vi-VN') {
   window.speechSynthesis.speak(speech);
 }
 
+let autoVoiceTimer = null;
+function stopSpeaking() {
+  clearTimeout(autoVoiceTimer); autoVoiceTimer = null;
+  if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+}
 /* Bong bóng tin nhắn của Cây Mầm có thể cập nhật dần (chữ chạy) rồi mới chốt */
 function createBotBubble() {
+  stopSpeaking();
   const r = document.createElement('div'); r.className = 'msg bot';
   r.innerHTML = avatarHTML();
   const b = document.createElement('div'); b.className = 'bubble streaming';
@@ -1558,8 +1572,9 @@ function finalizeBotBubble(h, t, lang = 'vi-VN') {
   ttsBtn.innerHTML = `<span aria-hidden="true">🔊</span> ${uiLang === 'en' ? 'Listen' : 'Nghe đọc'}`;
   ttsBtn.onclick = () => readStoryAloud(t, lang);
   h.bubble.appendChild(ttsBtn);
+  stopSpeaking(); // tin mới xuất hiện thì ngắt giọng đọc cũ, tránh chồng audio
   const autoVoice = document.getElementById('autoVoiceToggle');
-  if (autoVoice && autoVoice.checked) setTimeout(() => readStoryAloud(t, lang), 300);
+  if (autoVoice && autoVoice.checked) autoVoiceTimer = setTimeout(() => readStoryAloud(t, lang), 300);
   chat.scrollTop = chat.scrollHeight;
 }
 function msg(t, w = 'bot', lang) {
@@ -1612,7 +1627,7 @@ function options(arr, isDefault = false) {
 
 function choose(v, t) {
   msg(t, 'user');
-  if (state === 'emotion' && !v.startsWith('fu_')) {
+  if (S.state === 'emotion' && !v.startsWith('fu_')) {
     let moodLogs = readJSON('moodAnalytics');
     moodLogs.push({ emotion: t, date: new Date().toLocaleDateString(), ts: Date.now() });
     if (moodLogs.length > 500) moodLogs = moodLogs.slice(-500);
@@ -1624,8 +1639,8 @@ function choose(v, t) {
     typing.remove();
     if (v.startsWith('fu_')) { handleFollowup(v); return; }
 
-    if(state === 'problem') {
-      selectedProblem = v; state = 'emotion';
+    if(S.state === 'problem') {
+      S.selectedProblem = v; S.state = 'emotion';
       currentSessionTs = null; flowSent = false; logSession('problem', v);
       const branch = tb(v);
       applyBranchTheme(v);
@@ -1634,20 +1649,20 @@ function choose(v, t) {
       msg(branch.askEmotion);
       options(branch.emotions.map(e => [e.id, e.title, e.desc, e.face]));
       moodScale('before');
-    } else if(state === 'emotion') {
-      selectedEmotion = v; state = 'cause';
+    } else if(S.state === 'emotion') {
+      S.selectedEmotion = v; S.state = 'cause';
       logSession('emotion', v);
       setFlowProgress('cause');
-      const branch = tb(selectedProblem);
+      const branch = tb(S.selectedProblem);
       const emo = branch.emotions.find(e => e.id === v);
       updateAvatarMood(emo.mood, emo.face, emo.plant);
       msg(branch.causeQ || t_('causeQ'));
       options(branch.causes[v]);
-    } else if(state === 'cause') {
-      state = 'followup';
+    } else if(S.state === 'cause') {
+      S.state = 'followup';
       logSession('cause', v);
       setFlowProgress('solution'); // bước 4: Giải pháp
-      const branch = tb(selectedProblem);
+      const branch = tb(S.selectedProblem);
       updateAvatarMood(branch.heal.mood, branch.heal.face, branch.heal.plant);
       let solutionText = branch.solutions[v] || Object.values(branch.solutions)[0] || t_('cheer');
       msg(solutionText + t_('afterSolution'));
@@ -1665,10 +1680,10 @@ function sendStatsEvent(obj) {
   try { fetch('/api/stats-event', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(obj), keepalive: true }).catch(() => {}); } catch (e) {}
 }
 function sendFlowOnce(outcome) {
-  if (flowSent || !selectedProblem) return;
+  if (flowSent || !S.selectedProblem) return;
   flowSent = true;
   const cur = readJSON('sessionLogs').find(l => l.ts === currentSessionTs) || {};
-  sendStatsEvent({ type: 'flow', problem: selectedProblem, emotion: cur.emotion || selectedEmotion || '', cause: cur.cause || '', outcome: outcome || '' });
+  sendStatsEvent({ type: 'flow', problem: S.selectedProblem, emotion: cur.emotion || S.selectedEmotion || '', cause: cur.cause || '', outcome: outcome || '' });
 }
 
 /* ===== CHẤM ĐIỂM TÂM TRẠNG TRƯỚC / SAU (1–5, không bắt buộc) ===== */
@@ -1698,7 +1713,7 @@ function moodScale(kind) {
 }
 
 function handleFollowup(v) {
-  if (['fu_better', 'fu_sad', 'fu_talk', 'fu_new', 'fu_story'].includes(v) && state === 'followup') sendFlowOnce(v === 'fu_better' ? 'better' : v === 'fu_sad' ? 'still_sad' : '');
+  if (['fu_better', 'fu_sad', 'fu_talk', 'fu_new', 'fu_story'].includes(v) && S.state === 'followup') sendFlowOnce(v === 'fu_better' ? 'better' : v === 'fu_sad' ? 'still_sad' : '');
   if (v === 'fu_better') {
     if (currentSessionTs) logSession('outcome', 'better');
     updateAvatarMood('mood-happy', '😄', '🌳');
@@ -2124,6 +2139,7 @@ function triggerWidget(type) {
             <button onclick="saveGratitudeItem(this)">Thả vào hũ</button>
           </div>
           <div class="jar-count"></div>
+          <div class="jar-note" aria-live="polite"></div>
         </div>
       </div>
       <div class="gratitudeList" style="margin-top: 12px; font-size: 13px; max-height: 120px; overflow-y: auto;"></div>`;
@@ -2344,17 +2360,24 @@ function initScratchCards() {
 /* ---------- Hũ biết ơn: mỗi điều là một ngôi sao trong hũ ---------- */
 const STAR_COLORS = ['#f6c344', '#f39c8d', '#9fd3a6', '#a7b6f0', '#f7a6c8', '#ffd59e'];
 function starHTML(i, drop = false) {
-  // vị trí giả ngẫu nhiên nhưng cố định theo thứ tự, xếp dần từ đáy hũ lên
-  const row = Math.floor(i / 6), col = i % 6;
-  const left = 8 + col * 14 + ((row * 7 + i * 13) % 9) - 4;
-  const bottom = 4 + row * 11 + ((i * 5) % 5);
+  // sao xếp dần từ đáy hũ lên, không giới hạn số lượng – hũ đầy thì cuộn lên xem
   const rot = (i * 47) % 360;
-  return `<span class="jstar${drop ? ' drop' : ''}" style="left:${left}%;bottom:${Math.min(bottom, 78)}%;--r:${rot}deg;color:${STAR_COLORS[i % STAR_COLORS.length]}">★</span>`;
+  return `<button type="button" class="jstar${drop ? ' drop' : ''}" data-i="${i}" aria-label="Xem điều biết ơn số ${i + 1}" style="--r:${rot}deg;color:${STAR_COLORS[i % STAR_COLORS.length]}">★</button>`;
 }
 function renderJar(card, dropNew = false) {
   const items = readJSON('gratitudeJar');
-  const shown = Math.min(items.length, 42);
+  const shown = items.length;
   card.querySelector('.jar-stars').innerHTML = Array.from({ length: shown }, (_, i) => starHTML(i, dropNew && i === shown - 1)).join('');
+  if (dropNew) { const jb = card.querySelector('.jar-body'); jb.scrollTop = jb.scrollHeight; }
+  const note = card.querySelector('.jar-note');
+  if (note && !note.dataset.set) note.textContent = items.length ? 'Bấm vào một ngôi sao để xem lại điều biết ơn nhé ✨' : '';
+  card.querySelectorAll('.jstar').forEach(st => st.onclick = () => {
+    const it = items[+st.dataset.i]; if (!it || !note) return;
+    card.querySelectorAll('.jstar.sel').forEach(x => x.classList.remove('sel'));
+    st.classList.add('sel');
+    note.dataset.set = '1';
+    note.innerHTML = `<small>📅 ${escapeHTML(it.date)}</small>✨ ${escapeHTML(it.text)}`;
+  });
   card.querySelector('.jar-count').textContent = items.length ? `Hũ của cậu đã có ${items.length} ngôi sao biết ơn ✨` : 'Hũ đang trống – ngôi sao đầu tiên đang chờ cậu đó 🌱';
 }
 function saveGratitudeItem(el) {
@@ -2398,9 +2421,9 @@ function currentContext() {
   const groups = chat.querySelectorAll('.options');
   const open = groups[groups.length - 1];
   const opts = open && open.querySelector('.opt:not(:disabled)') ? [...open.querySelectorAll('.opt strong')].map(s => s.textContent) : [];
-  return { step: state, problem: selectedProblem, emotion: selectedEmotion, options: opts.slice(0, 6) };
+  return { step: S.state, problem: S.selectedProblem, emotion: S.selectedEmotion, options: opts.slice(0, 6) };
 }
-const MID_FLOW = () => state === 'emotion' || state === 'cause';
+const MID_FLOW = () => S.state === 'emotion' || S.state === 'cause';
 
 /* Đọc luồng Server-Sent Events từ /api/analyze-stream; onDelta(chữ) cho mỗi phần, trả về gói "done" */
 async function readAnalyzeStream(body, signal, onDelta) {
@@ -2427,9 +2450,15 @@ async function readAnalyzeStream(body, signal, onDelta) {
   return done;
 }
 
+let sendLocked = false;
 async function sendText() {
   if (micListening) stopMic(true);
   let t = input.value.trim(); if(!t) return;
+  if (sendLocked) return; // chống spam: khóa nút Gửi ~1.2 giây sau mỗi lần gửi
+  sendLocked = true;
+  const sendBtnEl = document.getElementById('sendBtn');
+  if (sendBtnEl) sendBtnEl.disabled = true;
+  setTimeout(() => { sendLocked = false; if (sendBtnEl) sendBtnEl.disabled = false; }, 1200);
   input.value = ''; msg(t, 'user');
   const userLang = detectLang(t);
   rememberLang(userLang);
@@ -2446,7 +2475,7 @@ async function sendText() {
   try {
     const ctrl = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), 30000);
-    const body = JSON.stringify({ text: t, mode: 'analyze', problem: selectedProblem, sessionId, context: currentContext() });
+    const body = JSON.stringify({ text: t, mode: 'analyze', problem: S.selectedProblem, sessionId, context: currentContext() });
     let d = null;
     try {
       // Cách chính: chữ chạy dần ngay khi AI bắt đầu viết
@@ -2483,9 +2512,9 @@ async function sendText() {
       return;
     }
     // Gợi ý đi vào nhánh phù hợp, chỉ khi học sinh không đang giữa chừng một nhánh
-    if (d.suggestedProblem && treeData[d.suggestedProblem] && (state === 'problem' || state === 'followup')) {
+    if (d.suggestedProblem && treeData[d.suggestedProblem] && (S.state === 'problem' || S.state === 'followup')) {
       const b = tb(d.suggestedProblem);
-      state = 'problem';
+      S.state = 'problem';
       setFlowProgress('problem');
       options([[d.suggestedProblem, b.label, t_('o_topicGo'), b.icon], opt_('fu_new', 'o_topicOther', '↻')]);
       return;
@@ -2506,13 +2535,13 @@ async function sendText() {
       const b = tb(guess);
       updateAvatarMood(b.start.mood, b.start.face, b.start.plant);
       msg(t_('m_guess')(stripNo(b.label)), 'bot');
-      state = 'problem';
+      S.state = 'problem';
       setFlowProgress('problem');
       options([[guess, b.label, t_('o_topicGoLocal'), b.icon], opt_('fu_new', 'o_topicOther', '↻')]);
     } else {
       updateAvatarMood('mood-listening', '🤔', '🌿');
       msg(pickText('notUnderstood', userLang), 'bot', LANG_TTS[userLang] || 'vi-VN');
-      state = 'problem';
+      S.state = 'problem';
       setFlowProgress('problem');
       options(Object.keys(treeData).map(k => { const b = tb(k); return [k, b.label, '', b.icon]; }), true);
     }
@@ -2739,7 +2768,7 @@ function initMic() {
 }
 
 function startInitialFlow() {
-  state = 'problem'; selectedProblem = null; selectedEmotion = null;
+  resetFlowState();
   setFlowProgress('problem');
   msg(t_('startQ'));
   options(Object.keys(treeData).map(k => { const b = tb(k); return [k, b.label, '', b.icon]; }), true);
