@@ -528,6 +528,29 @@ button:focus-visible, .opt:focus-visible, .floating-btn:focus-visible, .floating
 .jar-note { margin-top: 8px; padding: 8px 10px; border-radius: 12px; background: rgba(232,168,124,0.12); border: 1px dashed var(--line); font-size: 13px; line-height: 1.5; min-height: 20px; overflow-wrap: anywhere; }
 .jar-note small { color: var(--muted); display: block; }
 /* ===== Ảnh: bài tập / hũ biết ơn / khoảnh khắc ===== */
+.tm-tile[data-action="todo"] .tm-ico { background: var(--btn-green); }
+.todo-list { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; max-height: 240px; overflow-y: auto; }
+.todo-item { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 12px; background: rgba(232,168,124,0.1); font-size: 14px; overflow-wrap: anywhere; }
+.todo-item input { width: 18px; height: 18px; flex-shrink: 0; accent-color: #c47c48; cursor: pointer; }
+.todo-item span { flex: 1; min-width: 0; }
+.todo-item.done span { text-decoration: line-through; color: var(--muted); }
+.todo-item button { border: 0; background: transparent; color: var(--muted); cursor: pointer; font-size: 14px; }
+.todo-sum { margin-top: 8px; font-size: 13px; color: var(--muted); }
+.tm-tile[data-action="letter"] .tm-ico { background: var(--btn-purple); }
+.tm-tile[data-action="sound"] .tm-ico { background: var(--btn-yellow); }
+.letter-box { width: 100%; min-height: 90px; resize: vertical; border: 1px solid var(--line); border-radius: 12px; padding: 10px 14px; background: var(--card); font: inherit; font-size: 14px; outline: none; box-sizing: border-box; }
+.letter-box:focus { border-color: #e8a87c; }
+.letter-row { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; align-items: center; }
+.letter-row select { flex: 1; min-width: 120px; border: 1px solid var(--line); border-radius: 12px; padding: 10px; background: var(--card); font: inherit; font-size: 13px; }
+.letter-list { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; max-height: 240px; overflow-y: auto; }
+.letter-item { padding: 8px 10px; border-radius: 12px; background: rgba(232,168,124,0.1); font-size: 13.5px; line-height: 1.5; overflow-wrap: anywhere; }
+.letter-item small { display: block; color: var(--muted); }
+.letter-item .small-btn { margin-top: 4px; padding: 4px 12px; }
+.sound-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+.sound-row .small-btn { background: var(--card); color: inherit; border: 1px solid var(--line); }
+.sound-row .small-btn.on { background: linear-gradient(135deg, #e8a87c, #c47c48); color: #fff; }
+.sound-vol { display: flex; align-items: center; gap: 8px; margin-top: 10px; font-size: 13px; color: var(--muted); }
+.sound-vol input { flex: 1; accent-color: #c47c48; }
 .photo-btn { width: 40px; height: 40px; flex-shrink: 0; border-radius: 50%; border: 1px solid var(--line); background: var(--btn-yellow); font-size: 18px; cursor: pointer; display: grid; place-items: center; transition: 0.2s; }
 .photo-btn:hover { transform: scale(1.06); }
 .photo-btn:disabled { opacity: .5; cursor: default; }
@@ -705,6 +728,18 @@ button:focus-visible, .opt:focus-visible, .floating-btn:focus-visible, .floating
           <button type="button" class="tm-tile tm-wide" role="menuitem" data-action="moments" style="--i:5">
             <span class="tm-ico" aria-hidden="true">📸</span>
             <span class="tm-text"><b>Khoảnh khắc</b><small id="tmMomentCount">Lưu ảnh nhỏ trên máy</small></span>
+          </button>
+          <button type="button" class="tm-tile tm-wide" role="menuitem" data-action="todo" style="--i:5">
+            <span class="tm-ico" aria-hidden="true">✅</span>
+            <span class="tm-text"><b>Việc nhỏ hôm nay</b><small id="tmTodoInfo">Chia nhỏ việc cho đỡ ngợp</small></span>
+          </button>
+          <button type="button" class="tm-tile tm-wide" role="menuitem" data-action="letter" style="--i:5">
+            <span class="tm-ico" aria-hidden="true">💌</span>
+            <span class="tm-text"><b>Thư gửi chính mình</b><small id="tmLetterInfo">Mở lại vào một ngày sau này</small></span>
+          </button>
+          <button type="button" class="tm-tile tm-wide" role="menuitem" data-action="sound" style="--i:5">
+            <span class="tm-ico" aria-hidden="true">🎧</span>
+            <span class="tm-text"><b>Âm thanh thư giãn</b><small>Mưa, sóng biển, gió</small></span>
           </button>
           <button type="button" class="tm-tile tm-wide" role="menuitem" data-action="analytics" style="--i:5">
             <span class="tm-ico" aria-hidden="true">📊</span>
@@ -1803,6 +1838,9 @@ const TOOL_ACTIONS = {
   scratch: () => triggerWidget('scratch'),
   jar: () => triggerWidget('jar'),
   moments: () => triggerWidget('moments'),
+  todo: () => triggerWidget('todo'),
+  letter: () => triggerWidget('letter'),
+  sound: () => triggerWidget('sound'),
   analytics: () => triggerWidget('analytics'),
   survey: () => triggerSurvey(),
   intro: () => showIntro(),
@@ -1818,6 +1856,10 @@ function refreshToolsMenu() {
   document.getElementById('tmJarCount').textContent = jar ? `${jar} điều đã thả vào hũ` : 'Hũ đang trống';
   const mc = document.getElementById('tmMomentCount');
   if (mc) { const n = readJSON('momentPhotos').length; mc.textContent = n ? `${n} khoảnh khắc đã lưu` : 'Lưu ảnh nhỏ trên máy'; }
+  const lt = document.getElementById('tmLetterInfo');
+  if (lt) { const L = readJSON('futureLetters'), ready = L.filter(x => x.open <= todayKey() && !x.read).length; lt.textContent = ready ? `Có ${ready} thư mở được rồi 💌` : L.length ? `${L.length} thư đang chờ ngày mở` : 'Mở lại vào một ngày sau này'; }
+  const td = document.getElementById('tmTodoInfo');
+  if (td) { const t = todayTodos(); td.textContent = t.length ? `Xong ${t.filter(x => x.done).length}/${t.length} việc hôm nay` : 'Chia nhỏ việc cho đỡ ngợp'; }
   const svDone = readJSON('surveyLogs').length, svEl = document.getElementById('tmSurveyInfo');
   if (svEl) svEl.textContent = svDone ? `Đã làm ${svDone} lần · xem cậu tiến xa chưa` : 'Nhìn lại xem cậu đã nhẹ lòng thêm chưa';
   const logs = readJSON('sessionLogs');
@@ -2175,6 +2217,50 @@ function triggerWidget(type) {
     chat.appendChild(box);
     renderGratitudeList(box.querySelector('.gratitudeList'));
     renderJar(box);
+  } else if(type === 'letter') {
+    const box = document.createElement('div');
+    box.className = 'action-card w-letter';
+    box.innerHTML = `
+      <h4>💌 Thư gửi chính mình</h4>
+      <p class="w-hint">Viết vài dòng cho cậu của tương lai. Thư được cất lại, đến ngày hẹn mới mở được. Chỉ lưu trên máy này 🔒</p>
+      <textarea class="letter-box" maxlength="600" placeholder="Gửi cậu của tương lai, lúc này tớ đang..." aria-label="Nội dung thư"></textarea>
+      <div class="letter-row">
+        <select class="letter-when" aria-label="Ngày mở thư"><option value="7">Mở sau 1 tuần</option><option value="30" selected>Mở sau 1 tháng</option><option value="90">Mở sau 3 tháng</option></select>
+        <button type="button" class="small-btn" onclick="sendLetter(this)">Cất thư</button>
+      </div>
+      <div class="letter-list"></div>`;
+    chat.appendChild(box);
+    renderLetters(box);
+    chat.scrollTop = chat.scrollHeight;
+  } else if(type === 'sound') {
+    const box = document.createElement('div');
+    box.className = 'action-card w-sound';
+    box.innerHTML = `
+      <h4>🎧 Âm thanh thư giãn</h4>
+      <p class="w-hint">Đeo tai nghe, hít thở chậm và nghe một chút cho dịu lại. Bấm lần nữa để tắt.</p>
+      <div class="sound-row">
+        <button type="button" class="small-btn" data-snd="rain" onclick="toggleAmbient(this,'rain')">🌧️ Mưa</button>
+        <button type="button" class="small-btn" data-snd="sea" onclick="toggleAmbient(this,'sea')">🌊 Sóng biển</button>
+        <button type="button" class="small-btn" data-snd="wind" onclick="toggleAmbient(this,'wind')">🍃 Gió</button>
+      </div>
+      <label class="sound-vol">🔈 <input type="range" min="5" max="100" value="40" aria-label="Âm lượng" oninput="if(amb) amb.master.gain.value=this.value/100"></label>`;
+    chat.appendChild(box);
+    chat.scrollTop = chat.scrollHeight;
+  } else if(type === 'todo') {
+    const box = document.createElement('div');
+    box.className = 'action-card w-todo';
+    box.innerHTML = `
+      <h4>✅ Việc nhỏ hôm nay</h4>
+      <p class="w-hint">Việc to thì chia thành những bước nhỏ, làm xong bước nào tích bước đó. Danh sách chỉ lưu trên máy này 🔒</p>
+      <div class="task-input">
+        <input class="todoInput" placeholder="VD: Làm 5 câu bài tập toán..." autocomplete="off" maxlength="100" aria-label="Việc nhỏ cần làm" onkeydown="if(event.key==='Enter') addTodo(this)" />
+        <button onclick="addTodo(this)">Thêm</button>
+      </div>
+      <div class="todo-list"></div>
+      <div class="todo-sum" aria-live="polite"></div>`;
+    chat.appendChild(box);
+    renderTodos(box);
+    chat.scrollTop = chat.scrollHeight;
   } else if(type === 'moments') {
     const box = document.createElement('div');
     box.className = 'action-card w-moments';
@@ -2287,8 +2373,8 @@ function exportCSV() {
 function clearMyData() {
   const menu = document.getElementById('floatingMenu');
   if (menu) menu.classList.remove('show');
-  if (!confirm('Xóa toàn bộ thống kê cảm xúc, hũ biết ơn, ảnh khoảnh khắc và chuỗi ngày trên máy này?')) return;
-  ['moodAnalytics', 'gratitudeJar', 'momentPhotos', 'sessionLogs', 'surveyLogs', 'healStreak', 'lastActiveDate', 'healSessionId'].forEach(k => localStorage.removeItem(k));
+  if (!confirm('Xóa toàn bộ thống kê cảm xúc, hũ biết ơn, ảnh khoảnh khắc, thư và chuỗi ngày trên máy này?')) return;
+  ['moodAnalytics', 'gratitudeJar', 'momentPhotos', 'miniTodos', 'futureLetters', 'sessionLogs', 'surveyLogs', 'healStreak', 'lastActiveDate', 'healSessionId'].forEach(k => localStorage.removeItem(k));
   initStreak();
   restartInteractive();
   msg('Đã xóa sạch dữ liệu của cậu trên máy này rồi nhé 🔒');
@@ -2510,6 +2596,98 @@ function sendHomeworkPhoto() {
   }, { maxDim: 1280, quality: 0.8 });
 }
 document.getElementById('hwPhotoBtn').addEventListener('click', sendHomeworkPhoto);
+/* ===== VIỆC NHỎ HÔM NAY: danh sách nhỏ, chỉ lưu trên máy, tự sang ngày mới là trống ===== */
+const todayKey = () => new Date().toISOString().slice(0, 10);
+function todayTodos() { return readJSON('miniTodos').filter(x => x.day === todayKey()); }
+function saveTodos(list) { writeJSON('miniTodos', list.slice(-100)); }
+function renderTodos(card) {
+  const all = readJSON('miniTodos'), day = todayKey();
+  const items = all.filter(x => x.day === day);
+  const box = card.querySelector('.todo-list');
+  box.innerHTML = items.length ? items.map(x => `<label class="todo-item${x.done ? ' done' : ''}"><input type="checkbox" data-id="${x.id}"${x.done ? ' checked' : ''}><span>${escapeHTML(x.text)}</span><button type="button" data-del="${x.id}" aria-label="Xóa việc">✕</button></label>`).join('')
+    : `<i style="color: var(--muted);">Chưa có việc nào. Thêm một việc thật nhỏ thôi nhé 🌱</i>`;
+  const done = items.filter(x => x.done).length;
+  card.querySelector('.todo-sum').textContent = !items.length ? '' : done === items.length ? `Xong hết ${items.length} việc rồi, giỏi quá 🎉` : `Xong ${done}/${items.length} việc, từng bước nhỏ thôi nhé 💪`;
+  box.querySelectorAll('input').forEach(cb => cb.onchange = () => {
+    const a = readJSON('miniTodos'), it = a.find(x => x.id === cb.dataset.id); if (it) it.done = cb.checked;
+    saveTodos(a); renderTodos(card); refreshToolsMenu();
+    if (cb.checked && todayTodos().every(x => x.done)) setTimeout(triggerConfetti, 200);
+  });
+  box.querySelectorAll('[data-del]').forEach(b => b.onclick = e => {
+    e.preventDefault(); saveTodos(readJSON('miniTodos').filter(x => x.id !== b.dataset.del)); renderTodos(card); refreshToolsMenu();
+  });
+}
+function addTodo(el) {
+  const card = el.closest('.action-card'), inp = card.querySelector('.todoInput');
+  const text = inp.value.trim(); if (!text) { inp.focus(); return; }
+  const a = readJSON('miniTodos');
+  a.push({ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 5), text, done: false, day: todayKey() });
+  saveTodos(a); inp.value = ''; renderTodos(card); refreshToolsMenu(); inp.focus();
+}
+/* ===== THƯ GỬI CHÍNH MÌNH: viết hôm nay, đến ngày hẹn mới mở được (lưu trên máy) ===== */
+function addDaysKey(n) { const d = new Date(); d.setDate(d.getDate() + n); return d.toISOString().slice(0, 10); }
+const fmtDay = k => k.split('-').reverse().join('/');
+function renderLetters(card) {
+  const L = readJSON('futureLetters'), today = todayKey();
+  const box = card.querySelector('.letter-list');
+  box.innerHTML = L.length ? L.slice().reverse().map(x => x.open <= today
+    ? `<div class="letter-item"><small>💌 Viết ngày ${fmtDay(x.day)}, mở được từ ${fmtDay(x.open)}</small>${x.read ? escapeHTML(x.text) : `<button type="button" class="small-btn" data-read="${x.id}">Mở thư ra đọc</button>`}</div>`
+    : `<div class="letter-item"><small>🔒 Viết ngày ${fmtDay(x.day)}</small>Thư đang chờ, mở được vào ngày ${fmtDay(x.open)} ✨</div>`).join('')
+    : `<i style="color: var(--muted);">Chưa có lá thư nào. Viết vài dòng cho cậu của tương lai nhé 🌱</i>`;
+  box.querySelectorAll('[data-read]').forEach(b => b.onclick = () => {
+    const a = readJSON('futureLetters'), it = a.find(x => x.id === b.dataset.read); if (it) it.read = true;
+    writeJSON('futureLetters', a); renderLetters(card); refreshToolsMenu();
+  });
+}
+function sendLetter(el) {
+  const card = el.closest('.action-card'), ta = card.querySelector('.letter-box');
+  const text = ta.value.trim(); if (!text) { ta.focus(); return; }
+  const a = readJSON('futureLetters');
+  a.push({ id: Date.now().toString(36), text, day: todayKey(), open: addDaysKey(+card.querySelector('.letter-when').value), read: false });
+  if (!saveJSONChecked('futureLetters', a)) { showToast('Bộ nhớ máy đã đầy, chưa lưu được thư 😢'); return; }
+  ta.value = ''; renderLetters(card); refreshToolsMenu(); showToast('Đã cất thư vào tương lai 💌');
+}
+/* ===== ÂM THANH THƯ GIÃN: tự tạo bằng Web Audio, không cần file âm thanh ===== */
+let amb = null;
+function stopAmbient() {
+  if (!amb) return;
+  try { amb.nodes.forEach(n => { try { n.stop && n.stop(); } catch (e) {} }); amb.ctx.close(); } catch (e) {}
+  amb = null;
+}
+function startAmbient(kind, vol) {
+  stopAmbient();
+  const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return false;
+  const ctx = new AC(), len = ctx.sampleRate * 3, buf = ctx.createBuffer(1, len, ctx.sampleRate), d = buf.getChannelData(0);
+  let last = 0;
+  for (let i = 0; i < len; i++) { const w = Math.random() * 2 - 1; if (kind === 'sea') { last = (last + 0.02 * w) / 1.02; d[i] = last * 3.5; } else d[i] = w; }
+  const src = ctx.createBufferSource(); src.buffer = buf; src.loop = true;
+  const master = ctx.createGain(); master.gain.value = vol; master.connect(ctx.destination);
+  const nodes = [src];
+  if (kind === 'rain') {
+    const hp = ctx.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 900;
+    const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 7000;
+    const g = ctx.createGain(); g.gain.value = 0.5;
+    src.connect(hp); hp.connect(lp); lp.connect(g); g.connect(master);
+  } else {
+    const f = ctx.createBiquadFilter(); f.type = kind === 'sea' ? 'lowpass' : 'bandpass'; f.frequency.value = kind === 'sea' ? 700 : 500; f.Q.value = kind === 'sea' ? 0.7 : 0.8;
+    const swell = ctx.createGain(); swell.gain.value = kind === 'sea' ? 0.55 : 0.6;
+    const lfo = ctx.createOscillator(); lfo.frequency.value = kind === 'sea' ? 0.12 : 0.07;
+    const depth = ctx.createGain(); depth.gain.value = kind === 'sea' ? 0.35 : 220;
+    lfo.connect(depth); depth.connect(kind === 'sea' ? swell.gain : f.frequency); lfo.start(); nodes.push(lfo);
+    src.connect(f); f.connect(swell); swell.connect(master);
+  }
+  src.start();
+  amb = { ctx, master, nodes, kind };
+  return true;
+}
+function toggleAmbient(btn, kind) {
+  const card = btn.closest('.action-card'), vol = +card.querySelector('.sound-vol input').value / 100;
+  const was = amb && amb.kind === kind;
+  card.querySelectorAll('.sound-row [data-snd]').forEach(b => b.classList.remove('on'));
+  if (was) { stopAmbient(); return; }
+  if (!startAmbient(kind, vol)) { showToast('Trình duyệt này chưa phát được âm thanh thư giãn'); return; }
+  btn.classList.add('on');
+}
 function saveGratitudeItem(el) {
   const card = el.closest('.action-card');
   const inputEl = card.querySelector('.gratitudeInput');
