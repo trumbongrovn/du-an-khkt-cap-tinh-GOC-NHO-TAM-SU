@@ -527,6 +527,25 @@ button:focus-visible, .opt:focus-visible, .floating-btn:focus-visible, .floating
 .jstar.sel { font-size: 19px; z-index: 2; filter: drop-shadow(0 0 4px rgba(246,195,68,0.9)); }
 .jar-note { margin-top: 8px; padding: 8px 10px; border-radius: 12px; background: rgba(232,168,124,0.12); border: 1px dashed var(--line); font-size: 13px; line-height: 1.5; min-height: 20px; overflow-wrap: anywhere; }
 .jar-note small { color: var(--muted); display: block; }
+/* ===== Ảnh: bài tập / hũ biết ơn / khoảnh khắc ===== */
+.photo-btn { width: 40px; height: 40px; flex-shrink: 0; border-radius: 50%; border: 1px solid var(--line); background: var(--btn-yellow); font-size: 18px; cursor: pointer; display: grid; place-items: center; transition: 0.2s; }
+.photo-btn:hover { transform: scale(1.06); }
+.photo-btn:disabled { opacity: .5; cursor: default; }
+@media (max-width: 640px) { .photo-btn { width: 36px; height: 36px; font-size: 16px; } }
+.task-input .jar-photo-btn { background: var(--card); color: inherit; border: 1px solid var(--line); padding: 10px 12px; }
+.jar-photo-prev { display: none; align-items: center; gap: 8px; margin-top: 6px; font-size: 12px; color: var(--muted); }
+.jar-photo-prev.on { display: flex; }
+.jar-photo-prev img, .jar-note img, .bubble img.chat-photo { display: block; max-width: 100%; border-radius: 12px; }
+.jar-photo-prev img { width: 44px; height: 44px; object-fit: cover; }
+.jar-note img { margin-top: 6px; max-height: 220px; object-fit: contain; }
+.bubble img.chat-photo { max-height: 240px; margin-bottom: 6px; }
+.moment-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(88px, 1fr)); gap: 8px; margin-top: 10px; max-height: 260px; overflow-y: auto; }
+.moment-grid figure { margin: 0; position: relative; }
+.moment-grid img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 12px; cursor: pointer; display: block; }
+.moment-grid figcaption { font-size: 10.5px; color: var(--muted); text-align: center; margin-top: 2px; }
+.moment-del { position: absolute; top: 3px; right: 3px; width: 22px; height: 22px; border-radius: 50%; border: 0; background: rgba(0,0,0,.55); color: #fff; font-size: 12px; cursor: pointer; line-height: 1; }
+.photo-viewer { position: fixed; inset: 0; z-index: 9999; background: rgba(0,0,0,.8); display: grid; place-items: center; padding: 16px; }
+.photo-viewer img { max-width: 100%; max-height: 90vh; border-radius: 14px; }
 .jstar.drop { animation: starDrop 0.75s cubic-bezier(.5,0,.75,0) both; }
 @keyframes starDrop { 0% { transform: translateY(-120px) rotate(0deg); opacity: 0; } 30% { opacity: 1; } 85% { transform: translateY(4px) rotate(var(--r)); } 100% { transform: translateY(0) rotate(var(--r)); } }
 .jar-side { flex: 1; min-width: 0; }
@@ -643,6 +662,7 @@ button:focus-visible, .opt:focus-visible, .floating-btn:focus-visible, .floating
     <div class="compose">
       <input id="input" placeholder="Bạn hãy chia sẻ với mình..." autocomplete="off" aria-label="Ô nhập tâm sự" maxlength="500" />
       <button type="button" id="micBtn" class="mic-btn" aria-label="Bấm để nói" title="Bấm để nói, bấm lần nữa để dừng">🎤</button>
+      <button type="button" id="hwPhotoBtn" class="photo-btn" aria-label="Chụp hoặc chọn ảnh bài tập" title="Chụp / chọn ảnh bài tập, Cây Mầm sẽ gợi ý hướng làm (không đưa đáp án)">📷</button>
       <button type="button" id="micLangBtn" class="mic-lang" aria-label="Chọn ngôn ngữ nói" title="Chọn ngôn ngữ nói (bấm để đổi)">VI</button>
     </div>
     <button class="send-btn-direct" id="sendBtn" onclick="sendText()" aria-label="Gửi tin nhắn">
@@ -681,6 +701,10 @@ button:focus-visible, .opt:focus-visible, .floating-btn:focus-visible, .floating
           <button type="button" class="tm-tile tm-wide" role="menuitem" data-action="jar" style="--i:4">
             <span class="tm-ico" aria-hidden="true">🫙</span>
             <span class="tm-text"><b>Hũ biết ơn</b><small id="tmJarCount">Hũ đang trống</small></span>
+          </button>
+          <button type="button" class="tm-tile tm-wide" role="menuitem" data-action="moments" style="--i:5">
+            <span class="tm-ico" aria-hidden="true">📸</span>
+            <span class="tm-text"><b>Khoảnh khắc</b><small id="tmMomentCount">Lưu ảnh nhỏ trên máy</small></span>
           </button>
           <button type="button" class="tm-tile tm-wide" role="menuitem" data-action="analytics" style="--i:5">
             <span class="tm-ico" aria-hidden="true">📊</span>
@@ -1778,6 +1802,7 @@ const TOOL_ACTIONS = {
   cards: () => triggerWidget('cards'),
   scratch: () => triggerWidget('scratch'),
   jar: () => triggerWidget('jar'),
+  moments: () => triggerWidget('moments'),
   analytics: () => triggerWidget('analytics'),
   survey: () => triggerSurvey(),
   intro: () => showIntro(),
@@ -1791,6 +1816,8 @@ const toolItems = () => [...toolsMenu().querySelectorAll('[data-action]')];
 function refreshToolsMenu() {
   const jar = readJSON('gratitudeJar').length;
   document.getElementById('tmJarCount').textContent = jar ? `${jar} điều đã thả vào hũ` : 'Hũ đang trống';
+  const mc = document.getElementById('tmMomentCount');
+  if (mc) { const n = readJSON('momentPhotos').length; mc.textContent = n ? `${n} khoảnh khắc đã lưu` : 'Lưu ảnh nhỏ trên máy'; }
   const svDone = readJSON('surveyLogs').length, svEl = document.getElementById('tmSurveyInfo');
   if (svEl) svEl.textContent = svDone ? `Đã làm ${svDone} lần · xem cậu tiến xa chưa` : 'Nhìn lại xem cậu đã nhẹ lòng thêm chưa';
   const logs = readJSON('sessionLogs');
@@ -2136,8 +2163,10 @@ function triggerWidget(type) {
           <p class="w-hint">Hôm nay cậu có điều gì nhỏ nhặt khiến bản thân mỉm cười? Thả vào hũ nhé:</p>
           <div class="task-input">
             <input class="gratitudeInput" placeholder="VD: Hôm nay tớ đã tự nấu bữa sáng..." autocomplete="off" maxlength="200" aria-label="Điều biết ơn hôm nay" onkeydown="if(event.key==='Enter') saveGratitudeItem(this)" />
+            <button type="button" class="jar-photo-btn" onclick="pickJarPhoto(this)" aria-label="Đính kèm ảnh" title="Đính kèm ảnh cho điều biết ơn này">📷</button>
             <button onclick="saveGratitudeItem(this)">Thả vào hũ</button>
           </div>
+          <div class="jar-photo-prev"><img alt="Ảnh đính kèm"><span>Ảnh sẽ được thả cùng điều biết ơn</span><button type="button" class="small-btn" style="padding:4px 10px" onclick="clearJarPhoto(this)">Bỏ</button></div>
           <div class="jar-count"></div>
           <div class="jar-note" aria-live="polite"></div>
         </div>
@@ -2146,6 +2175,17 @@ function triggerWidget(type) {
     chat.appendChild(box);
     renderGratitudeList(box.querySelector('.gratitudeList'));
     renderJar(box);
+  } else if(type === 'moments') {
+    const box = document.createElement('div');
+    box.className = 'action-card w-moments';
+    box.innerHTML = `
+      <h4>📸 Khoảnh khắc của tớ</h4>
+      <p class="w-hint">Chụp hoặc chọn một tấm ảnh nhỏ để nhớ khoảnh khắc đáng yêu. Ảnh chỉ lưu trên máy này, không gửi đi đâu cả 🔒</p>
+      <button type="button" class="small-btn" onclick="addMoment(this)">📷 Chụp / chọn ảnh</button>
+      <div class="moment-grid"></div>`;
+    chat.appendChild(box);
+    renderMoments(box);
+    chat.scrollTop = chat.scrollHeight;
   } else if(type === 'analytics') {
     let moodLogs = readJSON('moodAnalytics');
     let analyticBox = document.createElement('div');
@@ -2247,8 +2287,8 @@ function exportCSV() {
 function clearMyData() {
   const menu = document.getElementById('floatingMenu');
   if (menu) menu.classList.remove('show');
-  if (!confirm('Xóa toàn bộ thống kê cảm xúc, hũ biết ơn và chuỗi ngày trên máy này?')) return;
-  ['moodAnalytics', 'gratitudeJar', 'sessionLogs', 'surveyLogs', 'healStreak', 'lastActiveDate', 'healSessionId'].forEach(k => localStorage.removeItem(k));
+  if (!confirm('Xóa toàn bộ thống kê cảm xúc, hũ biết ơn, ảnh khoảnh khắc và chuỗi ngày trên máy này?')) return;
+  ['moodAnalytics', 'gratitudeJar', 'momentPhotos', 'sessionLogs', 'surveyLogs', 'healStreak', 'lastActiveDate', 'healSessionId'].forEach(k => localStorage.removeItem(k));
   initStreak();
   restartInteractive();
   msg('Đã xóa sạch dữ liệu của cậu trên máy này rồi nhé 🔒');
@@ -2376,18 +2416,114 @@ function renderJar(card, dropNew = false) {
     card.querySelectorAll('.jstar.sel').forEach(x => x.classList.remove('sel'));
     st.classList.add('sel');
     note.dataset.set = '1';
-    note.innerHTML = `<small>📅 ${escapeHTML(it.date)}</small>✨ ${escapeHTML(it.text)}`;
+    note.innerHTML = `<small>📅 ${escapeHTML(it.date)}</small>✨ ${escapeHTML(it.text)}` + (it.photo ? `<img src="${it.photo}" alt="Ảnh của điều biết ơn này" onclick="viewPhoto(this.src)">` : '');
   });
   card.querySelector('.jar-count').textContent = items.length ? `Hũ của cậu đã có ${items.length} ngôi sao biết ơn ✨` : 'Hũ đang trống – ngôi sao đầu tiên đang chờ cậu đó 🌱';
 }
+/* ===== ẢNH: chọn/chụp, thu nhỏ rồi mới dùng (nhẹ localStorage & nhẹ đường truyền) ===== */
+function saveJSONChecked(key, val) {
+  try { localStorage.setItem(key, JSON.stringify(val)); return true; } catch (e) { return false; }
+}
+function pickPhoto(onPick, { maxDim = 800, quality = 0.72, capture = true } = {}) {
+  const f = document.createElement('input');
+  f.type = 'file'; f.accept = 'image/*';
+  if (capture) f.setAttribute('capture', 'environment');
+  f.onchange = () => {
+    const file = f.files && f.files[0]; if (!file) return;
+    if (!/^image\//.test(file.type)) { showToast('Chỉ nhận file ảnh thôi nhé 🙂'); return; }
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      const k = Math.min(1, maxDim / Math.max(img.width, img.height));
+      const c = document.createElement('canvas');
+      c.width = Math.max(1, Math.round(img.width * k)); c.height = Math.max(1, Math.round(img.height * k));
+      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+      URL.revokeObjectURL(url);
+      c.toBlob(blob => blob && onPick({ blob, dataURL: c.toDataURL('image/jpeg', quality) }), 'image/jpeg', quality);
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); showToast('Không đọc được ảnh này, thử ảnh khác nhé'); };
+    img.src = url;
+  };
+  f.click();
+}
+function viewPhoto(src) {
+  const v = document.createElement('div'); v.className = 'photo-viewer';
+  v.innerHTML = `<img alt="Ảnh phóng to">`; v.firstChild.src = src;
+  v.onclick = () => v.remove(); document.body.appendChild(v);
+}
+function pickJarPhoto(btn) {
+  const card = btn.closest('.action-card');
+  pickPhoto(({ dataURL }) => {
+    card._photo = dataURL;
+    const pv = card.querySelector('.jar-photo-prev'); pv.querySelector('img').src = dataURL; pv.classList.add('on');
+  }, { maxDim: 640, quality: 0.7 });
+}
+function clearJarPhoto(btn) {
+  const card = btn.closest('.action-card'); card._photo = null; card.querySelector('.jar-photo-prev').classList.remove('on');
+}
+function renderMoments(card) {
+  const items = readJSON('momentPhotos');
+  const grid = card.querySelector('.moment-grid');
+  grid.innerHTML = items.length ? items.map((m, i) => `<figure><img src="${m.photo}" alt="Khoảnh khắc ${escapeHTML(m.date)}" data-v="${i}"><button type="button" class="moment-del" data-d="${i}" aria-label="Xóa ảnh">✕</button><figcaption>${escapeHTML(m.date)}</figcaption></figure>`).join('')
+    : `<i style="color: var(--muted);">Chưa có khoảnh khắc nào. Chụp một tấm đầu tiên nhé 🌱</i>`;
+  grid.querySelectorAll('img').forEach(im => im.onclick = () => viewPhoto(im.src));
+  grid.querySelectorAll('.moment-del').forEach(b => b.onclick = () => {
+    const arr = readJSON('momentPhotos'); arr.splice(+b.dataset.d, 1); saveJSONChecked('momentPhotos', arr); renderMoments(card); refreshToolsMenu();
+  });
+}
+function addMoment(btn) {
+  const card = btn.closest('.action-card');
+  pickPhoto(({ dataURL }) => {
+    const arr = readJSON('momentPhotos');
+    arr.push({ photo: dataURL, date: new Date().toLocaleDateString() });
+    if (!saveJSONChecked('momentPhotos', arr)) { showToast('Bộ nhớ máy đã đầy, hãy xóa bớt ảnh cũ nhé 📷'); return; }
+    renderMoments(card); refreshToolsMenu(); showToast('Đã lưu khoảnh khắc 📸');
+  }, { maxDim: 800, quality: 0.72 });
+}
+/* Ảnh bài tập → /api/homework-photo → Cây Mầm chỉ gợi ý hướng làm */
+let hwBusy = false;
+function sendHomeworkPhoto() {
+  if (hwBusy) return;
+  pickPhoto(async ({ blob, dataURL }) => {
+    hwBusy = true;
+    const btn = document.getElementById('hwPhotoBtn'); if (btn) btn.disabled = true;
+    const note = input.value.trim().slice(0, 200); input.value = '';
+    msg(note || '📷 Ảnh bài tập', 'user');
+    const last = [...chat.querySelectorAll('.msg.user .bubble')].pop();
+    if (last) { const im = document.createElement('img'); im.className = 'chat-photo'; im.src = dataURL; im.alt = 'Ảnh bài tập'; last.insertBefore(im, last.firstChild); }
+    const typing = showTyping();
+    try {
+      const ctrl = new AbortController(); const timer = setTimeout(() => ctrl.abort(), 45000);
+      const r = await fetch('/api/homework-photo', { method: 'POST', headers: { 'Content-Type': 'image/jpeg', 'x-session-id': sessionId, 'x-note': encodeURIComponent(note) }, body: blob, signal: ctrl.signal });
+      clearTimeout(timer);
+      if (!r.ok && ![403, 429].includes(r.status)) throw new Error();
+      const d = await r.json();
+      typing.remove();
+      msg(d.reply || 'Tớ chưa đọc rõ ảnh, cậu chụp lại gần và đủ sáng hơn nhé 📷', 'bot', d.lang || 'vi-VN');
+      if (d.emotion && SERVER_MOODS[d.emotion]) { const f = SERVER_MOODS[d.emotion]; updateAvatarMood(f[0], f[1], f[2]); }
+    } catch (e) {
+      typing.remove();
+      msg('Tớ chưa xem được ảnh này. Cậu thử chụp lại rõ hơn, hoặc gõ đề bài ra cho tớ nhé 📷', 'bot');
+    } finally {
+      hwBusy = false; if (btn) btn.disabled = false;
+    }
+  }, { maxDim: 1280, quality: 0.8 });
+}
+document.getElementById('hwPhotoBtn').addEventListener('click', sendHomeworkPhoto);
 function saveGratitudeItem(el) {
   const card = el.closest('.action-card');
   const inputEl = card.querySelector('.gratitudeInput');
   const val = inputEl.value.trim();
   if(!val) { inputEl.focus(); return; }
   let items = readJSON('gratitudeJar');
-  items.push({ text: val, date: new Date().toLocaleDateString() });
-  writeJSON('gratitudeJar', items);
+  const entry = { text: val, date: new Date().toLocaleDateString() };
+  if (card._photo) entry.photo = card._photo;
+  items.push(entry);
+  if (!saveJSONChecked('gratitudeJar', items)) {
+    if (entry.photo) { delete entry.photo; saveJSONChecked('gratitudeJar', items); showToast('Bộ nhớ máy đầy nên tớ lưu chữ thôi, chưa lưu được ảnh nhé 📷'); }
+    else { items.pop(); showToast('Bộ nhớ máy đã đầy, chưa lưu được 😢'); return; }
+  }
+  card._photo = null; const pv = card.querySelector('.jar-photo-prev'); if (pv) pv.classList.remove('on');
   inputEl.value = '';
   document.querySelectorAll('.gratitudeList').forEach(renderGratitudeList);
   document.querySelectorAll('.w-jar').forEach(c => renderJar(c, c === card));

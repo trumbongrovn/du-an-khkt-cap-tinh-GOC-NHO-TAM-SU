@@ -636,6 +636,53 @@ app.post("/api/analyze", async (req, res) => {
   res.json(baseResponse(sid, { reply, lang, emotion, suggestedProblem, softCrisis, quickReplies }));
 });
 
+/* ====== ẢNH BÀI TẬP: học sinh chụp đề → Cây Mầm đọc ảnh và chỉ gợi ý hướng làm (không đưa đáp án) ====== */
+app.post(
+  "/api/homework-photo",
+  express.raw({ type: ["image/jpeg", "image/png", "image/webp"], limit: "4mb" }),
+  async (req, res) => {
+    const ip = req.ip || "unknown";
+    const sid = /^[\w-]{1,64}$/.test(String(req.get("x-session-id") || "")) ? String(req.get("x-session-id")) : `ip_${ip}`;
+    const ck = clientKeyOf(ip, sid);
+    if (rateLimited("hw:" + ip, 8)) return res.status(429).json(baseResponse(sid, { reply: FIXED.rate.vi, lang: "vi-VN" }));
+    const ban = getBan(ck);
+    if (ban) {
+      const retryAfterSec = Math.ceil((ban.until - Date.now()) / 1000);
+      return res.status(403).json(baseResponse(sid, { banned: true, retryAfterSec, emotion: "worried", lang: "vi-VN", reply: FIXED.bannedNow.vi(Math.ceil(retryAfterSec / 60)) }));
+    }
+    const img = req.body;
+    if (!Buffer.isBuffer(img) || img.length < 500) return res.status(400).json({ error: "Không có ảnh" });
+    const mimeType = String(req.get("content-type") || "image/jpeg").split(";")[0].trim();
+    let note = "";
+    try { note = decodeURIComponent(String(req.get("x-note") || "")).slice(0, 200); } catch { note = ""; }
+
+    const session = getSession(sid);
+    const instruction =
+      "[Học sinh gửi một ẢNH chụp bài tập/đề bài." + (note ? ` Lời nhắn kèm theo: "${note}".` : "") +
+      " Hãy đọc ảnh, nói ngắn gọn đây là bài gì, rồi CHỈ gợi ý hướng làm / công thức / bước đầu tiên theo đúng quy tắc BÀI TẬP (tuyệt đối KHÔNG giải ra đáp án cuối). " +
+      "Nếu ảnh mờ hoặc không phải bài tập thì nhẹ nhàng nhờ học sinh chụp lại hoặc nói rõ hơn. Trả lời tiếng Việt.]";
+    const raw = await callGemini({
+      contents: [
+        ...session.history,
+        { role: "user", parts: [{ inlineData: { mimeType, data: img.toString("base64") } }, { text: instruction }] },
+      ],
+      systemInstruction: buildSystem({ problem: "", memoryTags: session.memory_tags, flagged: [], context: "", langHint: "vi", lock: "vi", lastLang: session.lang }),
+      schema: RESPONSE_SCHEMA,
+    });
+    const d = raw ? safeParseJson(raw) : null;
+    if (!d || typeof d.reply !== "string" || !d.reply.trim()) return res.status(502).json({ error: "Chưa đọc được ảnh" });
+
+    const reply = d.reply.trim();
+    const emotion = EMOTIONS.includes(d.emotion) ? d.emotion : "neutral";
+    session.history.push(
+      { role: "user", parts: [{ text: "[Học sinh gửi ảnh bài tập]" + (note ? " " + note : "") }] },
+      { role: "model", parts: [{ text: JSON.stringify({ reply, emotion, suggestedProblem: "none", risk: "none", moderation: "none", lang: "vi", quickReplies: [], memory_tags: [] }) }] }
+    );
+    session.history = session.history.slice(-CFG.historyTurns * 2);
+    res.json(baseResponse(sid, { reply, lang: "vi-VN", emotion, quickReplies: cleanQuick(d.quickReplies) }));
+  }
+);
+
 /* ============================ 10. QUẢN TRỊ ================================== */
 function isAdmin(req) {
   if (!CFG.adminKey) return false;
