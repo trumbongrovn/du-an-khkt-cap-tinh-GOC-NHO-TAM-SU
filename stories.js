@@ -11,7 +11,7 @@ export const stories = [
     id: 2,
     title: "Nick Vujicic — Không tay, không chân, không nản chí",
     tags: ["low_test_result", "mistakes", "failure", "despair"],
-    text: "Sinh ra mà không có cả tay lẫn chân, Nick Vujicic từng trải qua tuổi thơ đầy tủi hờn, thậm chí từng muốn kết thúc cuộc đời mình trong bồn tắm khi mới 10 tuổi vì cảm thấy bản thân là gánh nặng. Thế nhưng, vượt lên trên sự cay đắng của số phận, Nick nhận ra rằng nếu anh không thể thay đổi cơ thể, anh có thể thay đổi thái độ sống. Anh học cách tự đứng trên đôi chân cụt nhỏ xíu của mình, học lướt sóng, đánh máy và trở thành diễn giả truyền cảm hứng đi khắp thế giới. Câu chuyện của Nick chứng minh rằng giá trị của bạn không nằm ở hoàn cảnh xuất phát, mà nằm ở sức mạnh đứng dậy sau mỗi lần vấp ngã."
+    text: "Sinh ra mà không có cả tay lẫn chân, Nick Vujicic từng trải qua tuổi thơ đầy tủi hờn, có những lúc cảm thấy bản thân khác biệt và nặng nề khi còn rất nhỏ. Thế nhưng, vượt lên trên sự cay đắng của số phận, Nick nhận ra rằng nếu anh không thể thay đổi cơ thể, anh có thể thay đổi thái độ sống. Anh học cách tự đứng trên đôi chân cụt nhỏ xíu của mình, học lướt sóng, đánh máy và trở thành diễn giả truyền cảm hứng đi khắp thế giới. Câu chuyện của Nick chứng minh rằng giá trị của bạn không nằm ở hoàn cảnh xuất phát, mà nằm ở sức mạnh đứng dậy sau mỗi lần vấp ngã."
   },
   {
     id: 3,
@@ -59,7 +59,7 @@ export const stories = [
     id: 10,
     title: "Ludwig van Beethoven — Bản giao hưởng cất lên từ cõi vô thinh",
     tags: ["overloaded", "criticism", "stress"],
-    text: "Đối với một người nghệ sĩ âm nhạc, đôi tai chính là sinh mệnh. Thế nhưng tai họa ập đến khi Beethoven dần bị mất đi thính giác, để rồi khi đến tuổi trung niên, ông hoàn toàn điếc đặc. Đứng trước bờ vực sụp đổ, có lúc ông đã định viết thư tuyệt mệnh. Nhưng tình yêu âm nhạc quá lớn đã giữ ông lại. Ông cắt bỏ 4 chân của cây đàn piano để áp sát mặt xuống sàn nhà, cảm nhận độ rung của phím đàn bằng cơ thể để tiếp tục sáng tác. Bản giao hưởng số 9 huyền thoại ra đời trong chính giai đoạn ông không thể nghe thấy một âm thanh nào. Khó khăn đôi khi là cách để cuộc đời ép ta khai phá những giới hạn phi thường nhất của bản thân."
+    text: "Đối với một người nghệ sĩ âm nhạc, đôi tai chính là sinh mệnh. Thế nhưng tai họa ập đến khi Beethoven dần bị mất đi thính giác, để rồi khi đến tuổi trung niên, ông hoàn toàn điếc đặc. Có những lúc ông rất đau lòng và thu mình lại, nhưng tình yêu âm nhạc quá lớn đã giữ ông ở lại với cuộc sống. Ông tìm cách cảm nhận độ rung của tiếng đàn bằng cơ thể để tiếp tục sáng tác. Bản giao hưởng số 9 huyền thoại ra đời trong chính giai đoạn ông không thể nghe thấy một âm thanh nào. Khó khăn đôi khi là cách để cuộc đời ép ta khai phá những giới hạn phi thường nhất của bản thân."
   },
   {
     id: 11,
@@ -83,7 +83,7 @@ export const stories = [
     id: 14,
     title: "Jim Carrey — Chiếc séc tự viết 10 triệu đô la từ đói nghèo",
     tags: ["poverty", "pressure", "dreams"],
-    text: "Thuở niên thiếu, gia đình Jim Carrey phá sản khiến ông phải bỏ học dở dang để làm bảo vệ ca đêm trong nhà máy thép nhằm kiếm tiền mưu sinh. Cả gia đình phải sống tạm bợ trên một chiếc xe ô tô cũ. Khi khởi nghiệp diễn viên hài tại Los Angeles, ông liên tục bị chê bai và từ chối. Trong những tháng ngày cơ cực nhất, ông tự viết cho mình một tấm séc trị giá 10 triệu đô la 'cho các dịch vụ diễn xuất đãrendered', ghi thời hạn 5 năm sau, và luôn cất nó trong ví làm động lực. Đến đúng năm thứ 5, ông nhận được đúng 10 triệu đô la cát-xê cho bộ phim 'Dumb and Dumber'. Sức mạnh của niềm tin và sự nỗ lực không ngừng nghỉ có thể biến điều tưởng chừng bất khả thi thành hiện thực."
+    text: "Thuở niên thiếu, gia đình Jim Carrey phá sản khiến ông phải bỏ học dở dang để làm bảo vệ ca đêm trong nhà máy thép nhằm kiếm tiền mưu sinh. Cả gia đình phải sống tạm bợ trên một chiếc xe ô tô cũ. Khi khởi nghiệp diễn viên hài tại Los Angeles, ông liên tục bị chê bai và từ chối. Trong những tháng ngày cơ cực nhất, ông tự viết cho mình một tấm séc trị giá 10 triệu đô la 'cho các dịch vụ diễn xuất đã thực hiện', ghi thời hạn 5 năm sau, và luôn cất nó trong ví làm động lực. Đến đúng năm thứ 5, ông nhận được đúng 10 triệu đô la cát-xê cho bộ phim 'Dumb and Dumber'. Sức mạnh của niềm tin và sự nỗ lực không ngừng nghỉ có thể biến điều tưởng chừng bất khả thi thành hiện thực."
   },
   {
     id: 15,
@@ -179,9 +179,8 @@ export const stories = [
     id: 30,
     title: "Viktor Frankl và ý nghĩa của sự lựa chọn thái độ sống",
     tags: ["concentration_camp", "resilience", "meaning"],
-    text: "Là một bác sĩ tâm thần gốc Do Thái bị giam cầm trong trại tập trung khắc nghiệt của phát xít Đức, Viktor Frankl chứng kiến cảnh gia đình sát hại và bản thân bị đày đọa đến tột cùng thể xác lẫn tinh thần. Giữa địa ngục trần gian đó, ông nhận ra một chân lý sâu sắc: Kẻ thù có thể cướp đi mọi thứ của bạn, ngoại trừ một thứ duy nhất — quyền được tự do lựa chọn thái độ ứng xử trước hoàn cảnh. Dù hoàn cảnh tồi tệ đến đâu, bạn vẫn luôn làm chủ được cách mình đối diện với nó."
+    text: "Là một bác sĩ tâm thần gốc Do Thái bị giam cầm trong trại tập trung khắc nghiệt của phát xít Đức, Viktor Frankl mất đi nhiều người thân yêu và bản thân phải chịu đựng gian khổ tột cùng. Giữa địa ngục trần gian đó, ông nhận ra một chân lý sâu sắc: Kẻ thù có thể cướp đi mọi thứ của bạn, ngoại trừ một thứ duy nhất — quyền được tự do lựa chọn thái độ ứng xử trước hoàn cảnh. Dù hoàn cảnh tồi tệ đến đâu, bạn vẫn luôn làm chủ được cách mình đối diện với nó."
   },
-  // Các câu chuyện từ 31 đến 100 tiếp tục bổ sung chuẩn chỉnh theo mạch cảm xúc tương tự để kho tàng phong phú tuyệt đối...
   {
     id: 31,
     title: "Charlie Chaplin — Từ khu ổ chuột Luân Đôn đến vua hề thế giới",
@@ -208,9 +207,9 @@ export const stories = [
   },
   {
     id: 35,
-    title: "桑d (Sanders) và bài học về không bao giờ bỏ cuộc ở tuổi xế chiều",
-    tags: ["resilience", "age", "perseverance"],
-    text: "Nhiều người nghĩ rằng tuổi trẻ mới là thời điểm duy nhất để lập nghiệp. Nhưng Đại tá Sanders đã chứng minh điều ngược lại khi khởi nghiệp thành công thương hiệu tỷ đô ở tuổi 65 sau một đời lận đận. Cuộc đời không quy định mốc thời gian thành công cho riêng ai, miễn là bạn còn giữ vững tinh thần dấn thân."
+    title: "Cây tre — Lặng lẽ bén rễ trước khi vươn cao",
+    tags: ["resilience", "patience", "perseverance"],
+    text: "Có một câu chuyện ngụ ngôn kể rằng: những năm đầu, cây tre gần như không cao thêm chút nào trên mặt đất, vì nó đang âm thầm bén rễ thật sâu dưới lòng đất. Đến khi rễ đã vững, nó vươn lên rất nhanh. Việc học của bạn cũng vậy: có những giai đoạn cố gắng mà chưa thấy kết quả, nhưng đó là lúc nền móng đang được xây. Hãy kiên nhẫn với chính mình nhé."
   },
   {
     id: 36,
@@ -242,7 +241,6 @@ export const stories = [
     tags: ["strategy", "patience", "leadership"],
     text: "Trước thế giặc Nguyên Mông hùng mạnh bậc nhất thế giới, Hưng Đạo Đại Vương luôn giữ sự bình tĩnh, biết nhẫn nại tích lũy lực lượng, khoan thư sức dân làm kế sâu rễ bền gốc thay vì nóng vội đối đầu trực diện. Bình tĩnh và có chiến lược rõ ràng là chìa khóa giải quyết mọi bài toán hóc búa."
   },
-  // Các câu chuyện từ 41 đến 100 tiếp tục được tối ưu cấu trúc tương tự để đảm bảo kho dữ liệu khổng lồ, sâu sắc và đầy đủ...
   {
     id: 41,
     title: "Mạc Đĩnh Chi — Trạng nguyên phong kiến vượt khó bằng đèn đom đóm",
@@ -303,7 +301,6 @@ export const stories = [
     tags: ["education", "reform", "enlightenment"],
     text: "Phan Châu Trinh chủ trương khai dân trí, hậu sinh khả uý, đưa giáo dục và tri thức làm gốc rễ để phát triển đất nước. Tri thức chính là chiếc chìa khóa duy nhất giải phóng con người khỏi mọi sự kìm kẹp."
   },
-  // Tiếp tục mở rộng hoàn thiện mốc từ 51 đến 100...
   {
     id: 51,
     title: "Nguyễn Thị Định — Nữ tướng tài ba của phong trào Đồng Khởi",
@@ -364,7 +361,6 @@ export const stories = [
     tags: ["realism", "humanity", "depth"],
     text: "Nhà văn Nam Cao với quan điểm nghệ thuật vị nhân sinh đã để lại kiệt tác như Chí Phèo, lột tả sâu sắc bi kịch con người nhưng vẫn giữ vững niềm tin vào bản chất lương thiện. Thấu hiểu con người chính là bước đầu tiên để chữa lành."
   },
-  // Hoàn thiện các câu chuyện tiếp theo từ 61 đến 100 để đảm bảo bộ sưu tập đồ sộ...
   {
     id: 61,
     title: "Ngô Bảo Châu — Niềm tự hào toán học Việt Nam",
@@ -421,22 +417,21 @@ export const stories = [
   },
   {
     id: 70,
-    title: "La Văn Cầu — Nghiến răng nhờ đồng đội chặt tay để tiếp tục chiến đấu",
+    title: "La Văn Cầu — Kiên cường vượt qua nỗi đau",
     tags: ["pain", "determination", "sacrifice"],
-    text: "Bị thương nát một bên tay trong trận Đông Khê, anh hùng La Văn Cầu đã tỉnh táo nhờ đồng đội dùng dao cắt bỏ phần tay bị thương để tiếp tục xông lên tiêu thụ lô-cốt địch. Ý chí chiến đấu vượt lên trên nỗi đau thể xác."
+    text: "Bị thương nặng ở tay trong trận Đông Khê, anh hùng La Văn Cầu vẫn kiên cường không rời trận địa và tiếp tục cùng đồng đội hoàn thành nhiệm vụ. Ý chí chiến đấu vượt lên trên nỗi đau thể xác."
   },
-  // Các câu chuyện từ 71 đến 100 tiếp tục bổ sung trọn vẹn mạch cảm xúc...
   {
     id: 71,
-    title: "Hoàng Diệu — Tiết thắt cổ tự vận giữ trọn thành trì",
+    title: "Hoàng Diệu — Giữ thành đến những phút cuối",
     tags: ["loyalty", "honor", "history"],
-    text: "Tổng đốc Hoàng Diệu tuẫn tiết để giữ trọn khí tiết khi thành Hà Nội thất thủ trước thực dân Pháp. Sự trung thực và danh dự cá nhân đôi khi cao hơn cả tính mạng."
+    text: "Tổng đốc Hoàng Diệu trực tiếp chỉ huy giữ thành Hà Nội trước thực dân Pháp dù lực lượng chênh lệch. Dù kết quả không như mong muốn, tinh thần trách nhiệm và dám đứng ra gánh vác của ông vẫn là bài học đáng nhớ."
   },
   {
     id: 72,
-    title: "Nguyễn Tri Phương — Bỏ ăn đến chết vì nước mất nhà tan",
+    title: "Nguyễn Tri Phương — Tấm lòng son sắt với quê hương",
     tags: ["patriotism", "dedication", "sorrow"],
-    text: "Bị thương nặng và bị giam giữ, danh tướng Nguyễn Tri Phương tuyệt thực đến chết khi thành Nam Định thất thủ. Tấm lòng son sắt với quốc gia là bài học lớn về lòng yêu nước."
+    text: "Dù tuổi cao và bị thương nặng, danh tướng Nguyễn Tri Phương vẫn đảm nhận trọng trách bảo vệ thành. Tấm lòng son sắt với quốc gia là bài học lớn về lòng yêu nước."
   },
   {
     id: 73,
@@ -486,7 +481,6 @@ export const stories = [
     tags: ["math", "pioneer", "education"],
     text: "GS. TSKH Lê Văn Thiêm là tiến sĩ toán học đầu tiên của Việt Nam, người đặt những viên gạch hồng đầu tiên cho ngành toán học nước nhà vươn ra thế giới."
   },
-  // Hoàn thiện nốt từ 81 đến 100 để sở hữu trọn bộ 100 câu chuyện độc quyền...
   {
     id: 81,
     title: "Nguyễn Văn Huyên — Nhà giáo dục tâm huyết",
@@ -547,7 +541,6 @@ export const stories = [
     tags: ["passion", "poetry", "energy"],
     text: "Thơ Xuân Diệu luôn tràn ngập sức sống cuộn trào, khát vọng yêu và sống hết mình từng giây phút."
   },
-  // Top 10 câu chuyện chốt hạ từ 91 đến 100 mang năng lượng tích cực đỉnh cao...
   {
     id: 91,
     title: "Nam Cao và bức thông điệp về lòng nhân ái",

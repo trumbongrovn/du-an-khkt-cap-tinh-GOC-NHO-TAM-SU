@@ -183,6 +183,14 @@ td.r,th.r{text-align:right}
       </table></div>
     </section>
 
+    <section class="panel">
+      <div class="panel-h"><h3>Thống kê ẩn danh</h3><p id="statSince">Chỉ là số đếm gộp, không lưu tin nhắn, IP hay phiên.</p></div>
+      <div class="scroll"><table>
+        <thead><tr><th>Chỉ số</th><th>Chi tiết</th></tr></thead>
+        <tbody id="statBody"></tbody>
+      </table></div>
+    </section>
+
     <div class="config" id="config"></div>
   </main>
 </div>
@@ -272,7 +280,37 @@ function render(d) {
     </tr>`).join('') : `<tr><td colspan="5" class="empty">Chưa có khóa API. Thêm GEMINI_API_KEYS vào tệp .env rồi chạy lại máy chủ.</td></tr>`;
 
   const scope = d.banScope === 'ip' ? 'Theo địa chỉ IP' : 'Theo IP và phiên';
+  renderStats(d.stats);
   $('config').innerHTML = `<span>Mô hình <b>${esc(d.model)}</b></span><span>Dự phòng <b>${esc(d.fallbackModel)}</b></span><span>Cách khóa <b>${scope}</b></span>`;
+}
+
+const ST_PROBLEM = { low_test_result: 'Điểm thấp', overloaded: 'Quá tải', difficult: 'Bài khó', criticism: 'Bị phê bình' };
+const ST_EMO = { sad: 'Buồn', tired: 'Mệt', worried: 'Lo lắng', stressed: 'Căng thẳng', shy: 'Ngại', angry: 'Giận', calm: 'Bình tĩnh', happy: 'Vui', neutral: 'Bình thường' };
+const ST_FACE = ['😢', '😕', '😐', '🙂', '😄'];
+function statBars(obj, labels) {
+  const rows = Object.entries(obj || {}).sort((a, b) => b[1] - a[1]).slice(0, 8);
+  if (!rows.length) return '<span class="muted">Chưa có dữ liệu</span>';
+  const max = rows[0][1];
+  return rows.map(([k, n]) => `<div class="meter" style="margin:2px 0"><span style="min-width:120px">${esc((labels && labels[k]) || k)}</span><div class="meter-bar"><i style="width:${Math.round(n / max * 100)}%"></i></div>${esc(n)}</div>`).join('');
+}
+function renderStats(st) {
+  st = st || {};
+  const sv = st.survey || {}, fl = st.flow || {}, mo = st.mood || {};
+  $('statSince').textContent = st.since ? 'Tính từ ' + new Date(st.since).toLocaleDateString('vi-VN') + ' · chỉ là số đếm gộp, không lưu tin nhắn, IP hay phiên.' : '';
+  const avg = sv.count && sv.moodSum ? (sv.moodSum / sv.count).toFixed(1) : '–';
+  const moodDist = {}; Object.entries(sv.mood || {}).forEach(([k, n]) => { moodDist[(ST_FACE[k - 1] || '') + ' ' + k] = n; });
+  const rows = [
+    ['Lượt khảo sát', `<b>${esc(sv.count || 0)}</b> <span class="muted">· tâm trạng trung bình ${esc(avg)}/5</span>`],
+    ['Tâm trạng sau khảo sát', statBars(moodDist)],
+    ['Vấn đề đã nhẹ đi', statBars(sv.solved)],
+    ['Chủ đề được chọn', statBars(fl.problem, ST_PROBLEM)],
+    ['Cảm xúc', statBars(fl.emotion, ST_EMO)],
+    ['Nguyên nhân', statBars(fl.cause)],
+    ['Kết quả cuộc trò chuyện', statBars(fl.outcome)],
+    ['Tâm trạng trước → sau', `<b>${esc(mo.count || 0)}</b> lượt <span class="muted">· khá hơn ${esc(mo.improved || 0)} · giữ nguyên ${esc(mo.same || 0)} · thấp hơn ${esc(mo.worse || 0)}</span>`],
+    ['Lượt hiện câu hỗ trợ khủng hoảng', `<b>${esc(st.crisis || 0)}</b>`],
+  ];
+  $('statBody').innerHTML = rows.map(r => `<tr><td>${r[0]}</td><td style="white-space:normal">${r[1]}</td></tr>`).join('');
 }
 
 async function load(silent) {

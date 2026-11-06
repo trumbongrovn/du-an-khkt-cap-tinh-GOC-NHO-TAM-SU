@@ -12,6 +12,7 @@
  */
 import "dotenv/config";
 import express from "express";
+import fs from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
 import { fileURLToPath } from "node:url";
@@ -161,7 +162,7 @@ const BAD_COMPACT = ["ditme", "ditconme", "dumemay", "dcmm", "vailon", "vaicalon
 function tier1Flag(raw) {
   const f = textForms(raw);
   const hits = new Set();
-  BAD_ACCENTED.forEach((w) => { if (f.accented.includes(w)) hits.add(w); });
+  BAD_ACCENTED.forEach((w) => { if (new RegExp(`(?<!\\p{L})${w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?!\\p{L})`, "u").test(f.accented)) hits.add(w); });
   BAD_WORDS.forEach((w) => { if (f.words.includes(` ${w} `)) hits.add(w); });
   BAD_COMPACT.forEach((w) => { if (f.compact.includes(w)) hits.add(w); });
   return [...hits];
@@ -343,6 +344,7 @@ const FIXED_I18N = {
   },
 };
 for (const [lg, pack] of Object.entries(FIXED_I18N)) for (const key of Object.keys(FIXED)) FIXED[key][lg] = pack[key];
+const EN_AMBIGUOUS = new Set(["i", "my", "the", "that", "not", "was", "im", "hi"]);
 function detectLang(t, hint = "") {
   if (/[\u3040-\u30ff]/.test(t)) return "ja-JP";
   if (/[\uac00-\ud7af]/.test(t)) return "ko-KR";
@@ -352,7 +354,10 @@ function detectLang(t, hint = "") {
   if (/[\u0600-\u06ff]/.test(t)) return "ar-SA";
   if (/[\u0900-\u097f]/.test(t)) return "hi-IN";
   if (/[ăđơưạảấầẩẫậắằẳẵặẹẻẽềếểễệỉịọỏốồổỗộớờởỡợụủứừửữựỳỵỷỹ]/i.test(t)) return "vi-VN";
-  if (/\b(i|you|my|the|is|are|what|how|why|please|help|feel|sad|tired|hello|hi|hey|want|talk|and|just|really|need|this|that|have|with|thanks|thank|today|school|exam|stressed|worried|lonely|not|dont|im|was)\b/i.test(t)) return "en-US";
+  const enHits = t.match(/\b(i|you|my|the|is|are|what|how|why|please|help|feel|sad|tired|hello|hi|hey|want|talk|and|just|really|need|this|that|have|with|thanks|thank|today|school|exam|stressed|worried|lonely|not|dont|im|was)\b/gi) || [];
+  // "the", "that", "i", "my", "not", "was", "im", "hi" trùng tiếng Việt không dấu (thế, thật, mỹ, nốt…) → cần thêm bằng chứng
+  const strongEn = enHits.filter((w) => !EN_AMBIGUOUS.has(w.toLowerCase())).length;
+  if (strongEn >= 1 || enHits.length >= 3) return "en-US";
   const HINTS = { vi: "vi-VN", en: "en-US", es: "es-ES", fr: "fr-FR", de: "de-DE", pt: "pt-BR", id: "id-ID" };
   return HINTS[hint] || "vi-VN";
 }
@@ -705,6 +710,7 @@ app.get("/api/admin-dashboard", requireAdmin, (_req, res) => {
       id: k.id, key: k.masked, available: k.cooldownUntil <= now,
       cooldownLeftSec: Math.max(0, Math.ceil((k.cooldownUntil - now) / 1000)), uses: k.uses, fails: k.fails, lastError: k.lastError,
     })),
+    stats,
     warnings: [...warnings].map(([client, w]) => ({ client, ip: w.ip, count: w.count, lastAt: new Date(w.lastAt).toLocaleString("vi-VN") })),
     banned: [...bannedIps].filter(([ck]) => getBan(ck)).map(([client, b]) => ({
       client, ip: b.ip, reason: b.reason, until: new Date(b.until).toLocaleString("vi-VN"), remainingMin: Math.ceil((b.until - now) / 60000),
@@ -726,11 +732,61 @@ app.all("/api/admin-unban", requireAdmin, (req, res) => {
 });
 
 /* ===================== Thống kê ẩn danh (khảo sát, chủ đề, cảm xúc) ===================== */
-const stats = new Map();
+// Chỉ lưu SỐ ĐẾM gộp, không lưu IP, phiên hay lời nhắn. Ghi ra stats.json để không mất khi restart.
+const STATS_FILE = process.env.STATS_FILE || path.join(__dirname, "stats.json");
+const newStats = () => ({
+  since: Date.now(), events: {}, crisis: 0,
+  survey: { count: 0, moodSum: 0, mood: {}, solved: {}, streakSum: 0 },
+  flow: { problem: {}, emotion: {}, cause: {}, outcome: {} },
+  mood: { count: 0, improved: 0, same: 0, worse: 0 },
+});
+let stats = newStats();
+try {
+  const saved = JSON.parse(fs.readFileSync(STATS_FILE, "utf8"));
+  const base = newStats();
+  stats = { ...base, ...saved, survey: { ...base.survey, ...saved.survey }, flow: { ...base.flow, ...saved.flow }, mood: { ...base.mood, ...saved.mood } };
+} catch { /* chưa có file → bắt đầu mới */ }
+
+let statsTimer = null;
+function saveStats() {
+  try { fs.writeFileSync(STATS_FILE + ".tmp", JSON.stringify(stats)); fs.renameSync(STATS_FILE + ".tmp", STATS_FILE); }
+  catch (e) { console.warn("[stats] không ghi được:", e.message); }
+}
+function scheduleSave() { if (!statsTimer) { statsTimer = setTimeout(() => { statsTimer = null; saveStats(); }, 5000); statsTimer.unref(); } }
+for (const sig of ["SIGINT", "SIGTERM"]) process.on(sig, () => { saveStats(); process.exit(0); });
+
+const statKey = (v) => String(v ?? "").replace(/[^\w.-]/g, "").slice(0, 40);
+function bump(bucket, v) {
+  const k = statKey(v); if (!k) return;
+  if (k in bucket || Object.keys(bucket).length < 60) bucket[k] = (bucket[k] || 0) + 1;
+}
+const int15 = (v) => { const n = Math.round(Number(v)); return n >= 1 && n <= 5 ? n : 0; };
+
 app.post("/api/stats-event", (req, res) => {
   if (rateLimited("st:" + (req.ip || "unknown"), 60)) return res.status(429).json({ ok: false });
-  const ev = String(req.body?.event || req.body?.type || "unknown").replace(/[^\w.-]/g, "").slice(0, 40) || "unknown";
-  if (stats.size < 200 || stats.has(ev)) stats.set(ev, (stats.get(ev) || 0) + 1);
+  const b = req.body || {};
+  const ev = statKey(b.event || b.type) || "unknown";
+  bump(stats.events, ev);
+  if (ev === "crisis") stats.crisis++;
+  else if (ev === "survey") {
+    const m = int15(b.mood);
+    stats.survey.count++;
+    if (m) { stats.survey.moodSum += m; bump(stats.survey.mood, m); }
+    stats.survey.streakSum += Math.min(365, Math.max(0, Number(b.streak) || 0));
+    if (Array.isArray(b.solved)) b.solved.slice(0, 12).forEach((k) => bump(stats.survey.solved, k));
+  } else if (ev === "flow") {
+    if (PROBLEMS[b.problem]) bump(stats.flow.problem, b.problem);
+    if (EMOTIONS.includes(b.emotion)) bump(stats.flow.emotion, b.emotion);
+    bump(stats.flow.cause, b.cause);
+    bump(stats.flow.outcome, b.outcome);
+  } else if (ev === "mood") {
+    const before = int15(b.before), after = int15(b.after);
+    if (after) {
+      stats.mood.count++;
+      if (before) { if (after > before) stats.mood.improved++; else if (after < before) stats.mood.worse++; else stats.mood.same++; }
+    }
+  }
+  scheduleSave();
   res.json({ ok: true });
 });
 
